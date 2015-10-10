@@ -1,26 +1,20 @@
 package fhl.main;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
-import pro.xstore.api.message.command.APICommandFactory;
-import pro.xstore.api.message.error.APICommandConstructionException;
-import pro.xstore.api.message.error.APICommunicationException;
-import pro.xstore.api.message.error.APIReplyParseException;
-import pro.xstore.api.message.records.STickRecord;
-import pro.xstore.api.message.records.STradeRecord;
-import pro.xstore.api.message.records.SymbolRecord;
-import pro.xstore.api.message.response.APIErrorResponse;
-import pro.xstore.api.message.response.AllSymbolsResponse;
-import pro.xstore.api.message.response.LoginResponse;
-import pro.xstore.api.streaming.StreamingListener;
-import pro.xstore.api.sync.Credentials;
-import pro.xstore.api.sync.ServerData.ServerEnum;
-import pro.xstore.api.sync.SyncAPIConnector;
+import fhl.main.logincontroller.LoginController;
+import fhl.main.sessionstorage.Session;
 
 public class Test {
 
 	public static void main(String[] args) {
+            Session session = new Session();
+            LoginController Login = new LoginController(session, "495753", "e83f7cea", "DEMO");
+            Login.DoLogin();
+            session.Init();
+            System.out.println(session.isIsLogged());
+            
+            
+            
+            /*
 		
 		try {
 			
@@ -82,15 +76,10 @@ public class Test {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (APICommandConstructionException e) {
-			e.printStackTrace();
-		} catch (APICommunicationException e) {
-			e.printStackTrace();
-		} catch (APIReplyParseException e) {
-			e.printStackTrace();
-		} catch (APIErrorResponse e) {
+		} catch (APICommandConstructionException | APICommunicationException | APIReplyParseException | APIErrorResponse e) {
 			e.printStackTrace();
 		}
+                    */
 	}
 }							
 
