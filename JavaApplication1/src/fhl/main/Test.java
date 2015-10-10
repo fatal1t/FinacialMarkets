@@ -8,8 +8,7 @@ public class Test {
 	public static void main(String[] args) {
             Session session = new Session();
             LoginController Login = new LoginController(session, "495753", "e83f7cea", "DEMO");
-            Login.DoLogin();
-            session.Init();
+            Login.DoLogin();            
             System.out.println(session.isIsLogged());
             
             

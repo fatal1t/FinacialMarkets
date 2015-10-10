@@ -6,6 +6,8 @@
 package fhl.main.adapters;
 
 import fhl.main.adapters.sync.requests.LoginReq;
+import fhl.main.adapters.sync.responses.GetAllSymbolsResponse;
+import fhl.main.adapters.sync.responses.GetUserDataResp;
 import fhl.main.adapters.sync.responses.LoginResp;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -15,6 +17,8 @@ import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.response.APIErrorResponse;
+import pro.xstore.api.message.response.AllSymbolsResponse;
+import pro.xstore.api.message.response.CurrentUserDataResponse;
 import pro.xstore.api.message.response.LoginResponse;
 import pro.xstore.api.message.response.LogoutResponse;
 import pro.xstore.api.sync.Credentials;
@@ -107,20 +111,30 @@ public class APISyncAdapter  {
     {
         try {
             LogoutResponse response = APICommandFactory.executeLogoutCommand(connector);
-        } catch (APICommandConstructionException ex) {
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (APICommunicationException ex) {
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (APIReplyParseException ex) {
+        } catch (APICommandConstructionException | APICommunicationException | APIReplyParseException ex) {
             Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (APIErrorResponse ex) {
             System.out.println(ex.getMessage());
             Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void GetAllSymbols()
+    public GetAllSymbolsResponse GetAllSymbols()
     {
-        
+        try {
+            AllSymbolsResponse response =  APICommandFactory.executeAllSymbolsCommand(connector);
+            GetAllSymbolsResponse resp = new GetAllSymbolsResponse();
+            response.getSymbolRecords().stream().forEach((rec) -> {
+                resp.AddSymbol(rec);
+            });
+            return resp;
+        } catch (APICommandConstructionException | APIReplyParseException | APICommunicationException ex) {
+            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (APIErrorResponse ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+                
     }    
     public void GetCalendar()
     {
@@ -130,9 +144,22 @@ public class APISyncAdapter  {
     {
         
     }
-    public void GetCurrentUserData()
+    public GetUserDataResp GetCurrentUserData()
     {
-        
+        try {
+            CurrentUserDataResponse response = APICommandFactory.executeCurrentUserDataCommand(connector);
+            return new GetUserDataResp(response.getCompanyUnit(), response.getCurrency(), 
+                    response.getGroup(), response.isIbAccount(), response.getLeverageMultiplier(), 
+                    response.getSpreadType());                
+                    
+        } catch (APICommandConstructionException | APICommunicationException | APIReplyParseException  ex) {
+            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch( APIErrorResponse exp)
+        {
+            System.out.println(exp.getMessage());
+        }
+        return null;
     }
     public void GetIBSHistory()
     {

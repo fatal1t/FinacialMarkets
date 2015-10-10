@@ -10,7 +10,10 @@ package fhl.main.sessionstorage;
  * @author Filip
  */
 public class Session {
+    
     private boolean isLogged;
+    private UserData userData;
+
     
     public Session()
     {
@@ -24,10 +27,20 @@ public class Session {
     public void setIsLogged(boolean isLogged) {
         this.isLogged = isLogged;
     }
+    
+    
 
     public void Init() {
         
 
     }
 
+    public UserData getUserData() {
+        return userData;
+    }
+
+    public void setUserData(UserData userData) {
+        this.userData = userData;
+    }
+    
 }
