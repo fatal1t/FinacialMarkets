@@ -5,7 +5,8 @@
  */
 package fhl.log.auditlog;
 
-import fhl.support.DBConnector.DBConnector;
+import fhl.log.databaseconnector.DatabaseConnector;
+import fhl.log.databaseconnector.DatabaseConnectorPool;
 
 /**
  *
@@ -13,7 +14,6 @@ import fhl.support.DBConnector.DBConnector;
  */
 public class AuditLogging {
     
-   private DBConnector connector;
    private static AuditLogging logger;
    private AuditLogging()
    {
@@ -27,8 +27,12 @@ public class AuditLogging {
        }
        return logger;
    }
-   public void LogOperation()
+   public void LogOperation(AuditLogEvent event)
    {
+       DatabaseConnectorPool pool = DatabaseConnectorPool.getPoolInstance();
+       DatabaseConnector connector = pool.getInstance();
+       connector.doAuditLog(event);
+       pool.returnInstance(connector);
        
    }
     

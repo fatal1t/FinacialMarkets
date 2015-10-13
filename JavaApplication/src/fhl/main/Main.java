@@ -4,7 +4,11 @@ import fhl.main.core.Core;
 import fhl.main.logincontroller.LoginController;
 import fhl.main.sessionstorage.Session;
 
-public class Test {
+/**
+ *
+ * @author Filip
+ */
+public class Main {
 
 	public static void main(String[] args) {
             Session session = new Session("495753", "e83f7cea", "DEMO");

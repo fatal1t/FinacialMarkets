@@ -5,6 +5,7 @@
  */
 package fhl.log.databaseconnector;
 
+import fhl.log.auditlog.AuditLogEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -33,7 +34,7 @@ public class DatabaseConnector {
     {
         
     }
-    public void doAuditLog()
+    public void doAuditLog(AuditLogEvent event)
     {
         
     }    
