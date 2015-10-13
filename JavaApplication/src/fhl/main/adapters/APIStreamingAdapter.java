@@ -10,7 +10,6 @@ import fhl.main.adapters.stream.eventdata.TradeRecord;
 import fhl.main.eventsHandlers.IHandleEvent;
 import fhl.main.sessionstorage.Session;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +41,7 @@ public class APIStreamingAdapter extends Thread {
     }
     
 
-    public void start(List<IHandleEvent> handlers)
+    public void start(List<IHandleEvent> handlers, List<String> symbols)
     {  
         try {
             StreamingListener sl = new StreamingListener() {
@@ -74,11 +73,7 @@ public class APIStreamingAdapter extends Thread {
             };
             
             this.connector.connectStream(sl);
-            List<String> symbols = new ArrayList<>();
-            symbols.add("EURUSD");
-            symbols.add("EURCHF");
-            symbols.add("EURCZK");
-            
+           
             this.connector.subscribePrices(symbols);
         } catch (IOException | APICommunicationException ex) {
             Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex);

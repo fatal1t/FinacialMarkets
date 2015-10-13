@@ -12,9 +12,6 @@ import fhl.main.adapters.sync.responses.GetAllSymbolsResponse;
 import fhl.main.adapters.sync.responses.GetUserDataResp;
 import fhl.main.adapters.sync.responses.LoginResp;
 import fhl.main.sessionstorage.Session;
-import fhl.main.sessionstorage.SymbolData;
-import fhl.main.sessionstorage.UserData;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

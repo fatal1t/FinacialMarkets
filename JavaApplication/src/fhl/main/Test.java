@@ -1,12 +1,8 @@
 package fhl.main;
 
-import fhl.main.adapters.APIStreamingAdapter;
-import fhl.main.eventsHandlers.IHandleEvent;
-import fhl.main.eventsHandlers.TickHandler;
+import fhl.main.core.Core;
 import fhl.main.logincontroller.LoginController;
 import fhl.main.sessionstorage.Session;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Test {
 
@@ -15,17 +11,11 @@ public class Test {
             LoginController Login = new LoginController(session, "495753", "e83f7cea", "DEMO");
             Login.DoLogin();            
             System.out.println(session.isIsLogged());
-            APIStreamingAdapter adapter = new APIStreamingAdapter(session);
-            List<IHandleEvent> handlers = new ArrayList<>();
-            handlers.add(new TickHandler());
             
-            adapter.initate();
-            adapter.start(handlers);
-            
-            
-            
-            
-            
+            //testovaci prasecinas
+            Core core = Core.getInstance();
+            core.InitializeCore(session);
+            core.start();
             /*
 		
 		try {

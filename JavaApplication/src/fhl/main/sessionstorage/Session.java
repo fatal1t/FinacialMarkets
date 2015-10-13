@@ -5,6 +5,7 @@
  */
 package fhl.main.sessionstorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,15 @@ public class Session {
     public void Init() {
         
 
+    }
+    public List<String> getSymbolsStrings()
+    {
+        List<String> symbolList = new ArrayList<>();
+        symbols.forEach((SymbolData symbol) -> 
+        {
+            symbolList.add(symbol.getSymbol());
+        });
+        return symbolList;
     }
 
     public UserData getUserData() {
