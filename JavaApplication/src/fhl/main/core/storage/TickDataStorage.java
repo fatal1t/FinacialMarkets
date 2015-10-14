@@ -3,16 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.core.queues;
-
-import fhl.main.adapters.stream.eventdata.BaseRecord;
+package fhl.main.core.storage;
 
 /**
  *
  * @author Filip
  */
-public interface IBaseQueue {
-    public void insertToQueue(BaseRecord record);
-    public BaseRecord getFromQueue( );
+public class TickDataStorage {
     
 }

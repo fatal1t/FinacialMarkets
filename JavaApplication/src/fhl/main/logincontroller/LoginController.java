@@ -5,6 +5,7 @@
  */
 package fhl.main.logincontroller;
 
+import fhl.log.auditlog.AuditLogEvent;
 import fhl.log.auditlog.AuditLogging;
 import fhl.main.adapters.APISyncAdapter;
 import fhl.main.adapters.sync.requests.LoginReq;
@@ -58,6 +59,7 @@ public class LoginController {
                         });
                     }
                 }
+                adapter.closeConnection();
             }
             else
             {
@@ -72,7 +74,7 @@ public class LoginController {
     private void logOperation()
     {
         AuditLogging logger = AuditLogging.GetLogger();
-        logger.LogOperation();
+        logger.LogOperation(new AuditLogEvent());
     }
             
     

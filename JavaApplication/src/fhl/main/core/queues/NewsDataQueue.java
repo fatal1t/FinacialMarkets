@@ -5,10 +5,23 @@
  */
 package fhl.main.core.queues;
 
+import fhl.main.adapters.stream.eventdata.BaseRecord;
+
 /**
  *
  * @author Filip
  */
-public class NewsDataQueue {
+public class NewsDataQueue implements IBaseQueue{
+
+    @Override
+    public void insertToQueue(BaseRecord record) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public BaseRecord getFromQueue( ) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     
 }

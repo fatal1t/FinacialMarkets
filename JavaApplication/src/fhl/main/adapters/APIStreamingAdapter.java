@@ -7,6 +7,7 @@ package fhl.main.adapters;
 
 import fhl.main.adapters.stream.eventdata.TickRecord;
 import fhl.main.adapters.stream.eventdata.TradeRecord;
+import fhl.main.core.QueueManager.QueueManager;
 import fhl.main.eventsHandlers.IHandleEvent;
 import fhl.main.sessionstorage.Session;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class APIStreamingAdapter extends Thread {
     }
     
 
-    public void start(List<IHandleEvent> handlers, List<String> symbols)
+    public void start(List<IHandleEvent> handlers, List<String> symbols, QueueManager manager)
     {  
         try {
             StreamingListener sl = new StreamingListener() {
@@ -68,7 +69,7 @@ public class APIStreamingAdapter extends Thread {
                                     tickRecord.getQuoteId(), tickRecord.getLevel(), tickRecord.getTimestamp()));
                         }
                     });
-                    System.out.println("Stream tick record: " + tickRecord);
+                    System.out.println("Stream tick record: " + tickRecord.getSymbol());
                 }
             };
             

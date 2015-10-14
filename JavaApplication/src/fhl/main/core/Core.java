@@ -6,21 +6,27 @@
 package fhl.main.core;
 
 import fhl.main.adapters.APIStreamingAdapter;
+import fhl.main.adapters.APISyncAdapter;
+import fhl.main.core.QueueManager.QueueManager;
 import fhl.main.eventsHandlers.IHandleEvent;
 import fhl.main.eventsHandlers.TickHandler;
 import fhl.main.sessionstorage.Session;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Filip
  */
 public class Core extends Thread {
-    private APIStreamingAdapter adapter;
+    private APIStreamingAdapter streamingAdapter;
+    private APISyncAdapter syncAdapter;
     private List<IHandleEvent> handlers;     
     private Session session;
     private static Core instance;
+    private QueueManager queueManager;
     private Core()
     {
         
@@ -37,15 +43,21 @@ public class Core extends Thread {
     
     public void InitializeCore(Session session)
     {
-        adapter = new APIStreamingAdapter(session);
+        this.streamingAdapter = new APIStreamingAdapter(session);
+        try {
+            this.syncAdapter = APISyncAdapter.GetAdapter(this.session.getServerType());
+        } catch (Exception ex) {
+            Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.handlers = new ArrayList<>();
         this.handlers.add(new TickHandler());
         this.session = session;
+        this.queueManager = new QueueManager();
     }
     @Override
     public void start()
     {
-        this.adapter.initate();
-        this.adapter.start(this.handlers,  session.getSymbolsStrings());
+        this.streamingAdapter.initate();
+        this.streamingAdapter.start(this.handlers,  session.getSymbolsStrings(), this.queueManager);
     }
 }
