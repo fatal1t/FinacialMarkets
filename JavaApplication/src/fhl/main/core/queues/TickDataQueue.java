@@ -6,21 +6,35 @@
 package fhl.main.core.queues;
 
 import fhl.main.adapters.stream.eventdata.BaseRecord;
+import fhl.main.adapters.stream.eventdata.TickRecord;
 
 /**
  *
  * @author Filip
  */
-public class TickDataQueue implements IBaseQueue{
-
-    @Override
-    public void insertToQueue(BaseRecord record) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+public class TickDataQueue extends BaseQueue implements IBaseQueue{
+    
+    public TickDataQueue()
+    {
+        super();
     }
 
     @Override
-    public BaseRecord getFromQueue( ) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void insertToQueue(BaseRecord record) {
+        try{
+            this.queue.add((TickRecord) record);
+            System.out.println("inserted record");
+        }
+        catch(Exception ex)
+        {
+            System.out.println("insert failed");
+        }
+    }
+
+    @Override
+    public BaseRecord getFromQueue() {
+        return this.queue.remove(0);
+        
     }
     
     

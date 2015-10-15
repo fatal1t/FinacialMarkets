@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.eventsHandlers;
-
-import fhl.main.adapters.stream.eventdata.BaseRecord;
+package fhl.main.core.lib.DataConnector;
 
 /**
  *
  * @author Filip
  */
-public class TradeHandler extends BaseRecord {
-    
+public class DataConnectorPool {
     
 }

@@ -11,7 +11,7 @@ import fhl.main.adapters.stream.eventdata.BaseRecord;
  *
  * @author Filip
  */
-public class NewsDataQueue implements IBaseQueue{
+public class NewsDataQueue extends BaseQueue implements IBaseQueue{
 
     @Override
     public void insertToQueue(BaseRecord record) {

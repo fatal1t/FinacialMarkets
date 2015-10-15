@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.core.queues;
+package fhl.main.core.datamanager.datahandlers;
 
 import fhl.main.adapters.stream.eventdata.BaseRecord;
 
@@ -11,8 +11,9 @@ import fhl.main.adapters.stream.eventdata.BaseRecord;
  *
  * @author Filip
  */
-public interface IBaseQueue {
-    public void insertToQueue(BaseRecord record);
-    public BaseRecord getFromQueue( );
-    public boolean isEmpty();
+public interface IDataHandler {
+    public void getRecord(BaseRecord record);
+    public void storeRecordOnline(BaseRecord record);
+    public void storeRecordToDatabase(BaseRecord record);  
+        
 }

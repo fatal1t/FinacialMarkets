@@ -38,29 +38,19 @@ public class APISyncAdapter  {
     private static APISyncAdapter adapter;
     
     
-    public static  APISyncAdapter GetAdapter(String ServerType) throws Exception
+    public static  APISyncAdapter GetAdapter(String insServerType)
     {
-        if(ServerType.equals(ServerType))
-        {
-            if(adapter == null)
-            {
-                adapter = new  APISyncAdapter(ServerType);
-            }
-            return adapter;
+        if(adapter == null){
+            adapter = new  APISyncAdapter(insServerType);    
         }
-        else
-        {
-            throw new Exception();
-        }
-
+        return adapter;
     }
     private APISyncAdapter(String ServerType)
     {
         try {
             if(ServerType.equals("DEMO"))
             {
-                APISyncAdapter.connector = new SyncAPIConnector(ServerData.ServerEnum.DEMO);
-                
+                APISyncAdapter.connector = new SyncAPIConnector(ServerData.ServerEnum.DEMO);                
                 APISyncAdapter.isConnected = true;
             }
             if(ServerType.equals("PROD"))

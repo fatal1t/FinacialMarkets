@@ -14,7 +14,6 @@ import fhl.main.core.queues.TradeDataQueue;
 import fhl.main.core.queues.TradesDataQueue;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  *
@@ -45,6 +44,7 @@ public class QueueManager {
             {
                 return this.queueList.get(i);
             }
+            i++;
         }
         return null;
     }

@@ -8,7 +8,6 @@ package fhl.main.adapters;
 import fhl.main.adapters.stream.eventdata.TickRecord;
 import fhl.main.adapters.stream.eventdata.TradeRecord;
 import fhl.main.core.QueueManager.QueueManager;
-import fhl.main.eventsHandlers.IHandleEvent;
 import fhl.main.sessionstorage.Session;
 import java.io.IOException;
 import java.util.List;
@@ -42,39 +41,28 @@ public class APIStreamingAdapter extends Thread {
     }
     
 
-    public void start(List<IHandleEvent> handlers, List<String> symbols, QueueManager manager)
+    public void start(List<String> symbols, QueueManager manager)
     {  
         try {
             StreamingListener sl = new StreamingListener() {
                 @Override
-                public void receiveTradeRecord(STradeRecord tradeRecord) {
-                    
-                    handlers.forEach((IHandleEvent handler) -> {
-                        if("TradeHandler".equals(handler.getClass().getName()))
-                            {
-                                handler.handleEvent(new TradeRecord());
-                            }
-                    });
+                public void receiveTradeRecord(STradeRecord tradeRecord) {     
                     System.out.println("Stream trade record: " + tradeRecord);
+                    manager.getQueue("TradeDataQueue").insertToQueue(new TradeRecord());
+                    
                 }
                 @Override
                 public void receiveTickRecord(STickRecord tickRecord) {
-                    handlers.forEach((IHandleEvent handler) -> {
-                        if(handler.getClass().getName().contains("TickHandler"))
-                        {
-                            handler.handleEvent(new TickRecord(tickRecord.getAsk(),
-                                    tickRecord.getBid(), tickRecord.getAskVolume(), tickRecord.getBidVolume(),
-                                    tickRecord.getHigh(), tickRecord.getLow(), tickRecord.getSpreadRaw(),
-                                    tickRecord.getSpreadTable(), tickRecord.getSymbol(),
-                                    tickRecord.getQuoteId(), tickRecord.getLevel(), tickRecord.getTimestamp()));
-                        }
-                    });
                     System.out.println("Stream tick record: " + tickRecord.getSymbol());
-                }
-            };
-            
-            this.connector.connectStream(sl);
-           
+                    manager.getQueue("TickDataQueue").insertToQueue(new TickRecord(tickRecord.getAsk(),
+                            tickRecord.getBid(), tickRecord.getAskVolume(), tickRecord.getBidVolume(),
+                            tickRecord.getHigh(), tickRecord.getLow(), tickRecord.getSpreadRaw(),
+                            tickRecord.getSpreadTable(), tickRecord.getSymbol(),
+                            tickRecord.getQuoteId(), tickRecord.getLevel(), tickRecord.getTimestamp()));
+                    
+                        }                  
+                };                       
+            this.connector.connectStream(sl);           
             this.connector.subscribePrices(symbols);
         } catch (IOException | APICommunicationException ex) {
             Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex);

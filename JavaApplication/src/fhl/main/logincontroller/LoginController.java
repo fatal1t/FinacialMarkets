@@ -36,7 +36,7 @@ public class LoginController {
     public void DoLogin()
     {
         try {
-            APISyncAdapter adapter = APISyncAdapter.GetAdapter(serverType);
+            APISyncAdapter adapter = APISyncAdapter.GetAdapter(this.session.getServerType());
             if(APISyncAdapter.isConnected)
             {
                 LoginResp loginReponse =  adapter.Login(new LoginReq(username, password));
@@ -59,7 +59,6 @@ public class LoginController {
                         });
                     }
                 }
-                adapter.closeConnection();
             }
             else
             {

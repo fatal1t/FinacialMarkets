@@ -29,5 +29,10 @@ public class BaseQueue implements IBaseQueue {
     public void insertToQueue(BaseRecord record) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public boolean isEmpty() {
+        return this.queue.isEmpty();
+    }
     
 }
