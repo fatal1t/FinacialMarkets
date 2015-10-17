@@ -6,39 +6,31 @@
 package fhl.main.core.datamanager.datahandlers;
 
 import fhl.main.adapters.stream.eventdata.BaseRecord;
-import fhl.main.core.queues.IBaseQueue;
-import fhl.main.core.queues.TickDataQueue;
+import fhl.main.adapters.stream.eventdata.TickRecord;
 
 /**
  *
  * @author Filip
  */
 public class TickDataHandler implements IDataHandler {
-    private TickDataQueue queue;
-    public TickDataHandler(IBaseQueue queue)
+    
+    public TickDataHandler()
     {
-        try{
-            this.queue = (TickDataQueue) queue;
-        }
-        catch(Exception ex)
-        {
-            System.out.println("Incorrect queue");
-        }
-        
+
     }
 
     @Override
-    public void getRecord(BaseRecord record) {
+    public void processRecord(BaseRecord record) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public void storeRecordOnline(BaseRecord record) {
+
+    protected void storeRecordOnline(BaseRecord record) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public void storeRecordToDatabase(BaseRecord record) {
+
+    protected void storeRecordToDatabase(TickRecord record) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

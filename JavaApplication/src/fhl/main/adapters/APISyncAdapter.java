@@ -7,20 +7,27 @@ package fhl.main.adapters;
 
 import fhl.main.adapters.sync.requests.LoginReq;
 import fhl.main.adapters.sync.responses.GetAllSymbolsResponse;
+import fhl.main.adapters.sync.responses.GetTradingHoursResponse;
 import fhl.main.adapters.sync.responses.GetUserDataResp;
 import fhl.main.adapters.sync.responses.LoginResp;
+import fhl.main.sessionstorage.HourData;
+import fhl.main.sessionstorage.SymbolTradingHours;
 import java.io.IOException;
+import java.sql.Time;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
+import pro.xstore.api.message.records.HoursRecord;
 import pro.xstore.api.message.response.APIErrorResponse;
 import pro.xstore.api.message.response.AllSymbolsResponse;
 import pro.xstore.api.message.response.CurrentUserDataResponse;
 import pro.xstore.api.message.response.LoginResponse;
 import pro.xstore.api.message.response.LogoutResponse;
+import pro.xstore.api.message.response.TradingHoursResponse;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.ServerData;
 import pro.xstore.api.sync.SyncAPIConnector;
@@ -170,9 +177,44 @@ public class APISyncAdapter  {
     {
         
     }
-    public void GetTradingHours()
+    public GetTradingHoursResponse GetTradingHours(List<String> symbols)
     {
-        
+        GetTradingHoursResponse data = null;
+        try
+        {
+            TradingHoursResponse response = APICommandFactory.executeTradingHoursCommand(connector, symbols);
+            data = new GetTradingHoursResponse();
+            for(String symbol : response.getSymbols())
+            {
+                SymbolTradingHours hours = new SymbolTradingHours(symbol);
+                int index = response.getSymbols().indexOf(symbol);
+                List<HoursRecord> respHours = response.getQuotes().get(index);
+                if(respHours!=null)
+                {
+                    respHours.forEach((HoursRecord hour) -> {
+                        Long day = hour.getDay();                       
+                        hours.getQuoteHours().add( new HourData(day.intValue(),
+                                new Time(hour.getFromT()), new Time(hour.getToT())));
+
+                    });
+                }
+                respHours = response.getTrading().get(index);
+                if(respHours!=null)
+                {
+                    respHours.forEach((HoursRecord hour) -> {
+                        Long day = hour.getDay();                       
+                        hours.getQuoteHours().add( new HourData(day.intValue(),
+                                new Time(hour.getFromT()), new Time(hour.getToT())));
+                    });  
+                }
+                data.addSymbolTradingHours(hours);
+            }            
+        }
+        catch(APICommandConstructionException | APICommunicationException | APIReplyParseException | APIErrorResponse ex)
+        {
+            
+        }
+        return data;
     }    
     public void GetVersion()
     {

@@ -3,16 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.core.datamanager.datahandlers;
-
-import fhl.main.adapters.stream.eventdata.BaseRecord;
+package fhl.main.adapters.stream.eventdata;
 
 /**
  *
  * @author Filip
  */
-public interface IDataHandler {
-    public void processRecord(BaseRecord record);
- 
-        
+public class NewsRecord {
+    
 }

@@ -17,9 +17,9 @@ public class Main {
             System.out.println(session.isIsLogged());
             
             //testovaci prasecinas
-            Core core = Core.getInstance();
-            core.InitializeCore(session);
-            core.start();
+            //Core core = Core.getInstance();
+            //core.InitializeCore(session);
+            //core.start();
             /*
 		
 		try {

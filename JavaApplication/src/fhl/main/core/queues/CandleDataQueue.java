@@ -24,6 +24,7 @@ public class CandleDataQueue extends BaseQueue implements IBaseQueue{
         try
         {
             this.queue.add((CandleDataRecord) record);
+            System.out.println("Candle Record inserted into queue");
         }
         catch(Exception ex)
         {
