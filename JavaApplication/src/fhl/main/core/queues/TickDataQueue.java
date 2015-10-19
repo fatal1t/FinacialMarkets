@@ -23,7 +23,7 @@ public class TickDataQueue extends BaseQueue implements IBaseQueue{
     public void insertToQueue(BaseRecord record) {
         try{
             this.queue.add((TickRecord) record);
-            System.out.println("TickData inserted record");
+            //System.out.println("TickData inserted record");
         }
         catch(Exception ex)
         {

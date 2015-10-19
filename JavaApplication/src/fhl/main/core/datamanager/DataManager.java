@@ -14,9 +14,7 @@ import fhl.main.core.datastorage.CandleStorage;
 import fhl.main.core.datastorage.TickStorage;
 import fhl.main.core.queues.CandleDataQueue;
 import fhl.main.core.queues.TickDataQueue;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  *
@@ -46,6 +44,7 @@ public class DataManager extends Thread {
         TickDataQueue tickQueue = (TickDataQueue) this.queueManager.getQueue("TickDataQueue");
         while(true)
         {
+            //Osetrit null pointer
             if(!candleQueue.isEmpty())
             {
                 CandleDataRecord newRecord = (CandleDataRecord) candleQueue.getFromQueue();
@@ -54,13 +53,14 @@ public class DataManager extends Thread {
                     this.candleStorages.put(newRecord.getSymbol(), new CandleStorage());
                     this.candleHandlers.put(newRecord.getSymbol(), new CandleDataHandler(this.candleStorages.get(newRecord.getSymbol())));
                 }
-                System.out.println("fronta vybrana, delka fronty = " + candleQueue.getLenght());
-
                 this.candleHandlers.get(newRecord.getSymbol()).processRecord(newRecord);
+                System.out.println("fronta vybrana, delka fronty = " + candleQueue.getLenght());
             }
             if(!tickQueue.isEmpty())
             {
                 TickRecord newRecord = (TickRecord) tickQueue.getFromQueue();
+                
+                //Osetrit null pointer 
                 if(!this.tickHandlers.containsKey(newRecord.getSymbol()))
                 {
                     this.tickStorages.put(newRecord.getSymbol(), new TickStorage());
@@ -70,9 +70,5 @@ public class DataManager extends Thread {
                 this.tickHandlers.get(newRecord.getSymbol()).processRecord(newRecord);
             }
         }
-    }
-    
-    
-    
-    
+    }    
 }

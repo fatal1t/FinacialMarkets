@@ -57,7 +57,7 @@ public class APIStreamingAdapter extends Thread {
             StreamingListener tickListener = new StreamingListener() {
                 @Override
                 public void receiveTickRecord(STickRecord tickRecord) {
-                    System.out.println("Stream tick record: " + tickRecord.getSymbol());
+                    //System.out.println("Stream tick record: " + tickRecord.getSymbol());
                     manager.getQueue("TickDataQueue").insertToQueue(new TickRecord(tickRecord.getAsk(),
                             tickRecord.getBid(), tickRecord.getAskVolume(), tickRecord.getBidVolume(),
                             tickRecord.getHigh(), tickRecord.getLow(), tickRecord.getSpreadRaw(),

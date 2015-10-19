@@ -29,7 +29,7 @@ public class CandleDataHandler implements IDataHandler{
         CandleDataRecord candleRecord = null;
         try{
             candleRecord = (CandleDataRecord) record;
-            System.out.println("vybrána fornta");
+            //System.out.println("vybrána fornta");
         }
         catch(Exception ex)
         {
