@@ -8,11 +8,14 @@ package fhl.main.logincontroller;
 import fhl.log.auditlog.AuditLogEvent;
 import fhl.log.auditlog.AuditLogging;
 import fhl.main.adapters.APISyncAdapter;
+import fhl.main.adapters.stream.eventdata.CandleDataRecord;
 import fhl.main.adapters.sync.requests.LoginReq;
 import fhl.main.adapters.sync.responses.GetAllSymbolsResponse;
 import fhl.main.adapters.sync.responses.GetTradingHoursResponse;
 import fhl.main.adapters.sync.responses.GetUserDataResp;
 import fhl.main.adapters.sync.responses.LoginResp;
+import fhl.main.core.lib.DataConnector.DataConnector;
+import fhl.main.core.lib.DataConnector.DataConnectorPool;
 import fhl.main.sessionstorage.Session;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +28,11 @@ public class LoginController {
 
     private final Session session;
     
-    public LoginController(Session session, String username, String password, String ServerType)
+    /**
+     *
+     * @param session the value of session
+     */
+    public LoginController(Session session)
     {
         this.session = session;
     }
@@ -56,7 +63,7 @@ public class LoginController {
                         });
                     }
                     GetTradingHoursResponse TradingHoursReponse = adapter.GetTradingHours(this.session.getSymbolsStrings());
-                    System.out.println(TradingHoursReponse.toString());
+                    this.session.setTradingHours(TradingHoursReponse.getSymbolTradingHoursList());
                 }
             }
             else
@@ -73,6 +80,13 @@ public class LoginController {
     {
         AuditLogging logger = AuditLogging.GetLogger();
         logger.LogOperation(new AuditLogEvent());
+    }
+    private void insertNewCandle()
+    {
+        DataConnectorPool pool = DataConnectorPool.getInstance();
+        DataConnector connector = pool.getConnector();
+        connector.insertCandle(new CandleDataRecord(1445197617 ,
+                "2015-10-18T19:46:57", 10.20, 11.52, 9.45, 10.35, 100, 1, "EURCZK"));
     }
             
     

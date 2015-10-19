@@ -15,4 +15,5 @@ public interface IBaseQueue {
     public void insertToQueue(BaseRecord record);
     public BaseRecord getFromQueue( );
     public boolean isEmpty();
+    public int getLenght();
 }

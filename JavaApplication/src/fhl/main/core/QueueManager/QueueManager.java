@@ -35,7 +35,7 @@ public class QueueManager {
         this.addQueue(new TradeDataQueue());
         this.addQueue(new TradesDataQueue());
     }
-    public IBaseQueue getQueue(String queueName)
+    public synchronized IBaseQueue getQueue(String queueName)
     {
         int i =0;
         while(i<this.queueList.size())
@@ -48,7 +48,7 @@ public class QueueManager {
         }
         return null;
     }
-    public boolean addQueue(IBaseQueue queue)
+    public synchronized boolean addQueue(IBaseQueue queue)
     {
         String className = queue.getClass().getName();
         this.isAdded = true;

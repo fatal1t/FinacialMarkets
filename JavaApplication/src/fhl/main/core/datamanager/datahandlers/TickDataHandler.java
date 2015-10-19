@@ -7,6 +7,7 @@ package fhl.main.core.datamanager.datahandlers;
 
 import fhl.main.adapters.stream.eventdata.BaseRecord;
 import fhl.main.adapters.stream.eventdata.TickRecord;
+import fhl.main.core.datastorage.TickStorage;
 
 /**
  *
@@ -14,14 +15,16 @@ import fhl.main.adapters.stream.eventdata.TickRecord;
  */
 public class TickDataHandler implements IDataHandler {
     
-    public TickDataHandler()
+    private final TickStorage storage;
+    
+    public TickDataHandler(TickStorage storage)
     {
-
+        this.storage = storage;
     }
 
     @Override
     public void processRecord(BaseRecord record) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
 

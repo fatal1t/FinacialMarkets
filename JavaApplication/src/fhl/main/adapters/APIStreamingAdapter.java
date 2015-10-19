@@ -10,7 +10,10 @@ import fhl.main.adapters.stream.eventdata.TickRecord;
 import fhl.main.core.QueueManager.QueueManager;
 import fhl.main.sessionstorage.Session;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pro.xstore.api.message.command.APICommandFactory;
@@ -46,6 +49,11 @@ public class APIStreamingAdapter extends Thread {
     public void start(List<String> symbols, QueueManager manager)
     {  
         try {
+            
+            List<String> testSymbols = new ArrayList<>();
+            testSymbols.add("EURUSD");
+            testSymbols.add("RU5S0");
+            //symbols = testSymbols;
             StreamingListener tickListener = new StreamingListener() {
                 @Override
                 public void receiveTickRecord(STickRecord tickRecord) {
@@ -58,7 +66,7 @@ public class APIStreamingAdapter extends Thread {
                     
                         }                  
                 };                       
-            this.tickConnector.connectStream(tickListener);           
+            this.tickConnector.connectStream(tickListener);
             this.tickConnector.subscribePrices(symbols);
             StreamingListener candlesListener = new StreamingListener()
             {
@@ -74,11 +82,38 @@ public class APIStreamingAdapter extends Thread {
             };
             this.candlesConnector.connectStream(candlesListener);
             this.candlesConnector.subscribeCandles(symbols);
+            
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        tickConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
+                        System.out.println("TickConnector refreshed");
+                        candlesConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
+                        System.out.println("CandlesConnector refreshed");
+                    } catch (APICommandConstructionException | APICommunicationException ex) {
+                        try {
+                            tickConnector = initConnector();
+                            candlesConnector = initConnector();
+                            tickConnector.connectStream(tickListener);
+                            tickConnector.subscribePrices(symbols);
+                            
+                            candlesConnector.connectStream(candlesListener);
+                            candlesConnector.subscribeCandles(symbols);
+                        } catch (IOException | APICommunicationException ex1) {
+                            Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex1);
+                        }
+                    }
+
+                }
+            }, 300000, 300000);
         } catch (IOException | APICommunicationException ex) {
             Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        }        
     }
+    
+    
     public void initate()
     {
         this.tickConnector = initConnector();

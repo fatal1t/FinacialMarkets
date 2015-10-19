@@ -21,7 +21,7 @@ public class BaseQueue implements IBaseQueue {
         this.queue = new ArrayList<>();
     }
     @Override
-    public BaseRecord getFromQueue( ) {        
+    public synchronized BaseRecord getFromQueue( ) {        
         return this.queue.remove(0);        
     } 
 
@@ -31,8 +31,15 @@ public class BaseQueue implements IBaseQueue {
     }
 
     @Override
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return this.queue.isEmpty();
     }
+
+    @Override
+    public int getLenght() {
+        return this.queue.size();
+    }
+    
+    
     
 }

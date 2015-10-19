@@ -7,6 +7,7 @@ package fhl.main.core.datamanager.datahandlers;
 
 import fhl.main.adapters.stream.eventdata.BaseRecord;
 import fhl.main.adapters.stream.eventdata.CandleDataRecord;
+import fhl.main.core.datastorage.CandleStorage;
 import fhl.main.core.lib.DataConnector.DataConnector;
 import fhl.main.core.lib.DataConnector.DataConnectorPool;
 
@@ -16,35 +17,40 @@ import fhl.main.core.lib.DataConnector.DataConnectorPool;
  */
 public class CandleDataHandler implements IDataHandler{
     
-    public CandleDataHandler()
+    private final CandleStorage storage;
+    
+    public CandleDataHandler(CandleStorage storage)
     {
-       
+       this.storage = storage;
     }
         
     @Override
-    public void processRecord(BaseRecord record) {
+    public synchronized void processRecord(BaseRecord record) {
         CandleDataRecord candleRecord = null;
         try{
             candleRecord = (CandleDataRecord) record;
+            System.out.println("vybrána fornta");
         }
         catch(Exception ex)
         {
             System.out.println("invalid object");
-        }
-        
+        }        
         storeRecordToDatabase(candleRecord);       
-        
+        storeRecordOnline(candleRecord);
     }
 
 
     protected void storeRecordOnline(BaseRecord record) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        this.storage.Insert((CandleDataRecord) record);
+        
     }
 
     private void storeRecordToDatabase(CandleDataRecord record) {
         DataConnectorPool pool = DataConnectorPool.getInstance();
         DataConnector connector = pool.getConnector();
-        connector.InsertCandle(record);
+        connector.insertCandle(record);
+        pool.returnConnector(connector);
     }
     
 }

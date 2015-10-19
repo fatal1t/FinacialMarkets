@@ -20,7 +20,7 @@ public class CandleDataQueue extends BaseQueue implements IBaseQueue{
     }
 
     @Override
-    public void insertToQueue(BaseRecord record) {
+    public synchronized void insertToQueue(BaseRecord record) {
         try
         {
             this.queue.add((CandleDataRecord) record);

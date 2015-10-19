@@ -39,4 +39,53 @@ public class TickRecord extends BaseRecord {
         this.level = level;
         this.timestamp = timestamp;
     }
+
+    public double getAsk() {
+        return ask;
+    }
+
+    public double getBid() {
+        return bid;
+    }
+
+    public long getAskVolume() {
+        return askVolume;
+    }
+
+    public long getBidVolume() {
+        return bidVolume;
+    }
+
+    public double getHigh() {
+        return high;
+    }
+
+    public double getLow() {
+        return low;
+    }
+
+    public double getSpreadRaw() {
+        return spreadRaw;
+    }
+
+    public double getSpreadTable() {
+        return spreadTable;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public int getQuoteId() {
+        return quoteId;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+    
 }

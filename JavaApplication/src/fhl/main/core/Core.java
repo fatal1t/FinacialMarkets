@@ -49,6 +49,7 @@ public class Core extends Thread {
         this.queueManager = new QueueManager();
         this.queueManager.initStreamingQueues();
         this.dataManager = new DataManager(this.queueManager);
+        
     }
     @Override
     public void start()

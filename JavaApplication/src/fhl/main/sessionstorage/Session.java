@@ -19,6 +19,7 @@ public class Session {
     private boolean isLogged;
     private UserData userData;
     private List<SymbolData> symbols;
+    private List<SymbolTradingHours> tradingHours;
 
     
     public Session(String username, String password, String serverType)
@@ -62,6 +63,7 @@ public class Session {
 
     public void setSymbols(List<SymbolData> symbols) {
         this.symbols = symbols;
+        
     }
 
     public List<SymbolData> getSymbols() {
@@ -79,5 +81,12 @@ public class Session {
     public String getServerType() {
         return serverType;
     }
-    
+
+    public List<SymbolTradingHours> getTradingHours() {
+        return tradingHours;
+    }
+
+    public void setTradingHours(List<SymbolTradingHours> tradingHours) {
+        this.tradingHours = tradingHours;
+    }    
 }
