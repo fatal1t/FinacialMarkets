@@ -9,7 +9,7 @@ package fhl.main.adapters.stream.eventdata;
  *
  * @author Filip
  */
-public class CandleDataRecord extends BaseRecord{
+public class CandleDataRecord extends BaseRecord {
     private final long ctm;
     private final String ctmString;
     private final double open;

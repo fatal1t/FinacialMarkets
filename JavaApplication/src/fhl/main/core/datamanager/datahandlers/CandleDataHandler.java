@@ -5,6 +5,7 @@
  */
 package fhl.main.core.datamanager.datahandlers;
 
+import fhl.log.generallog.GeneralLog;
 import fhl.main.adapters.stream.eventdata.BaseRecord;
 import fhl.main.adapters.stream.eventdata.CandleDataRecord;
 import fhl.main.core.datastorage.CandleStorage;
@@ -19,9 +20,12 @@ public class CandleDataHandler implements IDataHandler{
     
     private final CandleStorage storage;
     
-    public CandleDataHandler(CandleStorage storage)
-    {
-       this.storage = storage;
+    /**
+     *
+     * @param candleStorages
+     */
+    public CandleDataHandler(CandleStorage candleStorages) {
+        this.storage = candleStorages;
     }
         
     @Override
@@ -33,16 +37,26 @@ public class CandleDataHandler implements IDataHandler{
         }
         catch(Exception ex)
         {
-            System.out.println("invalid object");
+            GeneralLog.getLog().WriteToLog("invalid instance");
         }        
+        
         storeRecordToDatabase(candleRecord);       
         storeRecordOnline(candleRecord);
     }
 
 
     protected void storeRecordOnline(BaseRecord record) {
+        CandleDataRecord candleRecord = null;
+        try{
+            candleRecord = (CandleDataRecord) record;
+            this.storage.Insert((CandleDataRecord) record);
+        }
         
-        this.storage.Insert((CandleDataRecord) record);
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+                
         
     }
 

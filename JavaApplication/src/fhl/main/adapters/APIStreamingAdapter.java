@@ -5,6 +5,7 @@
  */
 package fhl.main.adapters;
 
+import fhl.log.generallog.GeneralLog;
 import fhl.main.adapters.stream.eventdata.CandleDataRecord;
 import fhl.main.adapters.stream.eventdata.TickRecord;
 import fhl.main.core.QueueManager.QueueManager;
@@ -73,6 +74,7 @@ public class APIStreamingAdapter extends Thread {
               @Override
               public void receiveCandleRecord(SCandleRecord candleRecord)
               {
+                  GeneralLog.getLog().WriteToLog("Stream candle record: " + candleRecord.getSymbol());
                   System.out.println("Stream candle record: " + candleRecord.getSymbol());
                   manager.getQueue("CandleDataQueue").insertToQueue(new CandleDataRecord(candleRecord.getCtm(), candleRecord.getCtmString(), 
                           candleRecord.getOpen(), candleRecord.getHigh(), candleRecord.getLow(), candleRecord.getClose(), 
@@ -89,9 +91,10 @@ public class APIStreamingAdapter extends Thread {
                 public void run() {
                     try {
                         tickConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
-                        System.out.println("TickConnector refreshed");
+                        GeneralLog.getLog().WriteToLog("TickConnector refreshed");
                         candlesConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
-                        System.out.println("CandlesConnector refreshed");
+                        GeneralLog.getLog().WriteToLog("CnadlesConnector refresed");
+
                     } catch (APICommandConstructionException | APICommunicationException ex) {
                         try {
                             tickConnector = initConnector();

@@ -9,6 +9,7 @@ import fhl.main.adapters.APIStreamingAdapter;
 import fhl.main.adapters.APISyncAdapter;
 import fhl.main.core.QueueManager.QueueManager;
 import fhl.main.core.datamanager.DataManager;
+import fhl.main.core.datastorage.CandleStorage;
 import fhl.main.sessionstorage.Session;
 
 /**
@@ -22,10 +23,8 @@ public class Core extends Thread {
     private static Core instance;
     private QueueManager queueManager;
     private DataManager dataManager;
-    private Core()
-    {
-        
-    }
+    private final CandleStorage candleStorage;
+
     
     public static Core getInstance()
     {
@@ -34,6 +33,10 @@ public class Core extends Thread {
             instance = new Core();
         }
         return instance;
+    }
+    private Core()
+    {
+        this.candleStorage = new CandleStorage();
     }
     
     public void InitializeCore(Session session)
@@ -45,17 +48,19 @@ public class Core extends Thread {
             this.syncAdapter = APISyncAdapter.GetAdapter(this.session.getServerType());
         } catch (Exception ex) {
             ex.printStackTrace();
-        }        
+        }
+        this.candleStorage.setSymbols(this.session.getSymbolsStrings());
+        
         this.queueManager = new QueueManager();
         this.queueManager.initStreamingQueues();
-        this.dataManager = new DataManager(this.queueManager);
+        this.dataManager = new DataManager(this.queueManager, this.candleStorage);
         
     }
     @Override
     public void start()
     {
         this.streamingAdapter.initate();
-        this.streamingAdapter.start(session.getSymbolsStrings(), this.queueManager);
+        this.streamingAdapter.start(session.getUsedSymbols(), this.queueManager);
         this.dataManager.start();
     }
 }

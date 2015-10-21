@@ -19,8 +19,8 @@ public class Session {
     private boolean isLogged;
     private UserData userData;
     private List<SymbolData> symbols;
+    private List<String> usedSymbols;
     private List<SymbolTradingHours> tradingHours;
-
     
     public Session(String username, String password, String serverType)
     {
@@ -63,7 +63,7 @@ public class Session {
 
     public void setSymbols(List<SymbolData> symbols) {
         this.symbols = symbols;
-        
+        setUsedSymbols();
     }
 
     public List<SymbolData> getSymbols() {
@@ -88,5 +88,17 @@ public class Session {
 
     public void setTradingHours(List<SymbolTradingHours> tradingHours) {
         this.tradingHours = tradingHours;
-    }    
+    }        
+    public List<String> getUsedSymbols() {
+        return usedSymbols;
+    }
+    private void setUsedSymbols()
+    {
+        this.usedSymbols = new ArrayList<>();
+        this.usedSymbols.add("EURUSD");
+        this.usedSymbols.add("USDJPY");
+        this.usedSymbols.add("GBPUSD");
+        this.usedSymbols.add("USDCHF");
+        
+    }
 }

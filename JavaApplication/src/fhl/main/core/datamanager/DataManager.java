@@ -5,6 +5,7 @@
  */
 package fhl.main.core.datamanager;
 
+import fhl.log.generallog.GeneralLog;
 import fhl.main.adapters.stream.eventdata.CandleDataRecord;
 import fhl.main.adapters.stream.eventdata.TickRecord;
 import fhl.main.core.QueueManager.QueueManager;
@@ -22,18 +23,15 @@ import java.util.HashMap;
  */
 public class DataManager extends Thread {
     private final QueueManager queueManager;
-    private final HashMap<String, CandleDataHandler> candleHandlers;
-    private final HashMap<String, TickDataHandler> tickHandlers;
-    
-    private final HashMap<String, CandleStorage> candleStorages;
-    private final HashMap<String, TickStorage> tickStorages;
+    private final CandleDataHandler candleHandlers;
+    private final TickDataHandler tickHandlers;
+    private final TickStorage tickStorages;
 
-    public DataManager(QueueManager queueManager) { 
-        this.candleStorages = new HashMap<>();
-        this.tickStorages = new HashMap<>();
+    public DataManager(QueueManager queueManager, CandleStorage candleStorage) { 
+        this.tickStorages = new TickStorage();
         this.queueManager = queueManager;        
-        this.candleHandlers = new HashMap<>();
-        this.tickHandlers = new HashMap<>();
+        this.candleHandlers = new CandleDataHandler(candleStorage);
+        this.tickHandlers = new TickDataHandler(this.tickStorages);
         
     }
     
@@ -48,26 +46,24 @@ public class DataManager extends Thread {
             if(!candleQueue.isEmpty())
             {
                 CandleDataRecord newRecord = (CandleDataRecord) candleQueue.getFromQueue();
-                if(!this.candleHandlers.containsKey(newRecord.getSymbol()))
-                {
-                    this.candleStorages.put(newRecord.getSymbol(), new CandleStorage());
-                    this.candleHandlers.put(newRecord.getSymbol(), new CandleDataHandler(this.candleStorages.get(newRecord.getSymbol())));
-                }
-                this.candleHandlers.get(newRecord.getSymbol()).processRecord(newRecord);
+                this.candleHandlers.processRecord(newRecord);
                 System.out.println("fronta vybrana, delka fronty = " + candleQueue.getLenght());
+                GeneralLog.getLog().WriteToLog("fronta vybrana, delka fronty = " + candleQueue.getLenght());
+
             }
             if(!tickQueue.isEmpty())
             {
                 TickRecord newRecord = (TickRecord) tickQueue.getFromQueue();
                 
                 //Osetrit null pointer 
-                if(!this.tickHandlers.containsKey(newRecord.getSymbol()))
+                try
                 {
-                    this.tickStorages.put(newRecord.getSymbol(), new TickStorage());
-                    this.tickHandlers.put(newRecord.getSymbol(), new TickDataHandler(this.tickStorages.get(newRecord.getSymbol())));
+                    this.tickHandlers.processRecord(newRecord);
                 }
-                //System.out.println("fronta vybrana");
-                this.tickHandlers.get(newRecord.getSymbol()).processRecord(newRecord);
+                catch(Exception ex)
+                {
+                    System.out.println("chyba u zaznamu");
+                }
             }
         }
     }    

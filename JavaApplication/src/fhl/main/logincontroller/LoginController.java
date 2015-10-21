@@ -81,13 +81,6 @@ public class LoginController {
         AuditLogging logger = AuditLogging.GetLogger();
         logger.LogOperation(new AuditLogEvent());
     }
-    private void insertNewCandle()
-    {
-        DataConnectorPool pool = DataConnectorPool.getInstance();
-        DataConnector connector = pool.getConnector();
-        connector.insertCandle(new CandleDataRecord(1445197617 ,
-                "2015-10-18T19:46:57", 10.20, 11.52, 9.45, 10.35, 100, 1, "EURCZK"));
-    }
-            
+           
     
 }
