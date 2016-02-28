@@ -5,18 +5,25 @@
  */
 package org.fatal1t.forexapp.session;
 
-import fhl.main.adapters.APISyncAdapter;
+import org.fatal1t.forexapp.spring.adapters.APISyncAdapter;
 import fhl.main.adapters.sync.requests.LoginReq;
 import fhl.main.adapters.sync.responses.GetUserDataResp;
 import fhl.main.adapters.sync.responses.LoginResp;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.jms.annotation.EnableJms;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Filip
  */
+@EnableJms
+@Component
 public class SessionLoader {
+
     static final Logger log = LogManager.getLogger(SessionLoader.class.getName());
     private final AppSession session;
     private final APISyncAdapter adapter;    

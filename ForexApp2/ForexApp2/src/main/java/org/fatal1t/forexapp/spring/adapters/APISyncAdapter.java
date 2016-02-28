@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.adapters;
+package org.fatal1t.forexapp.spring.adapters;
 
 import fhl.main.adapters.sync.requests.LoginReq;
 import fhl.main.adapters.sync.responses.GetAllSymbolsResponse;
@@ -13,6 +13,7 @@ import fhl.main.adapters.sync.responses.LoginResp;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.stereotype.Component;
@@ -37,42 +38,56 @@ import pro.xstore.api.sync.SyncAPIConnector;
 @Component
 public class APISyncAdapter  {
     
-    ConfigurableApplicationContext context;
-    
-    private static boolean IsLoggedIn;
-    private static String ServerType;
-    public static boolean isConnected;
-    private static SyncAPIConnector connector;
-    private static APISyncAdapter adapter;
-    
-    
-    public static  APISyncAdapter GetAdapter(String insServerType, ConfigurableApplicationContext context)
-    {
-        if(adapter == null){
-            adapter = new  APISyncAdapter(insServerType, context);    
-        }
-        return adapter;
+    private boolean IsLoggedIn;
+    private String ServerType;
+    public boolean isConnected;
+    private SyncAPIConnector connector;    
+
+    public String getServerType() {
+        return ServerType;
     }
-    private APISyncAdapter(String ServerType, ConfigurableApplicationContext context)
+
+    public void setServerType(String ServerType) {
+        this.ServerType = ServerType;
+    }
+
+    public boolean isIsConnected() {
+        return isConnected;
+    }
+    
+    
+    public APISyncAdapter()
     {
-        this.context = context;
+        
+    }
+    
+    public APISyncAdapter(String serverType)
+    {
+        init(serverType);
+
+    }
+    public void init(String serverType, String username, String password)
+    {
+        init(serverType);
+        LoginReq request = new LoginReq(username, password);
+        Login(request);
+    }
+
+    public void init(String ServerType1) {
         try {
-            if(ServerType.equals("DEMO"))
-            {
-                APISyncAdapter.connector = new SyncAPIConnector(ServerData.ServerEnum.DEMO);                
-                APISyncAdapter.isConnected = true;
+            if (ServerType1.equals("DEMO")) {
+                this.connector = new SyncAPIConnector(ServerData.ServerEnum.DEMO);                
+                this.isConnected = true;
             }
-            if(ServerType.equals("PROD"))
-            {
-                APISyncAdapter.connector = new SyncAPIConnector(ServerData.ServerEnum.REAL);
-                APISyncAdapter.isConnected = true;
+            if (ServerType1.equals("PROD")) {
+                this.connector = new SyncAPIConnector(ServerData.ServerEnum.REAL);
+                this.isConnected = true;
             }
-            APISyncAdapter.ServerType = ServerType;
-        } catch (IOException ex) {
-            APISyncAdapter.isConnected = false;
+            this.ServerType = ServerType1;
+        }catch (IOException ex) {
+            this.isConnected = false;
             Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
     
     public void closeConnection()

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.adapters;
+package org.fatal1t.forexapp.spring.adapters;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.fatal1t.forexapp.session.AppSession;
 import org.fatal1t.forexapp.session.SessionLocal;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.EnableJms;
@@ -40,6 +41,7 @@ import pro.xstore.api.sync.SyncAPIConnector;
 @Component
 @EnableJms
 public class APIStreamingAdapter extends Thread {
+    @Autowired
     ConfigurableApplicationContext context;
     private String TickQueueName = "mailbox-destination";
     private SessionLocal session;
@@ -49,8 +51,8 @@ public class APIStreamingAdapter extends Thread {
     private SyncAPIConnector candlesConnector;
     private SyncAPIConnector newsConnector;
 
-    public APIStreamingAdapter(ConfigurableApplicationContext context) {
-        this.context = context;
+    public APIStreamingAdapter() {
+        
     }
     
 

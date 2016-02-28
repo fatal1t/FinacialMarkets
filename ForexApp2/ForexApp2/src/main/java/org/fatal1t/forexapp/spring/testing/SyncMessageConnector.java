@@ -6,16 +6,18 @@
 package org.fatal1t.forexapp.spring.testing;
 
 import java.util.UUID;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
+import org.apache.log4j.LogManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -32,15 +34,14 @@ import org.springframework.stereotype.Component;
  * @author Filip
  */
 @Component
-public class Requestor {
+public class SyncMessageConnector {
     
     @Autowired
     private ConfigurableApplicationContext context;
-    
-    private static final Logger log = Logger.getLogger(Requestor.class.getName());
+    private static final Logger log = LogManager.getLogger(SyncMessageConnector.class.getName());
     private static final class ProducerConsumer implements SessionCallback<Message> {
  
-        private static final int TIMEOUT = 5000;
+        private static final int TIMEOUT = 500000;
  
         private final String msg;
  
@@ -55,6 +56,7 @@ public class Requestor {
         }
         @Override 
         public Message doInJms( final Session session ) throws JMSException {
+            
             MessageConsumer consumer = null;
             MessageProducer producer = null;
             try {
@@ -74,9 +76,15 @@ public class Requestor {
                 log.info("Sending message:" + msg);
                 producer = session.createProducer( requestQueue );
                 producer.send( requestQueue, textMessage );
-                // Block on receiving the response with a timeout
-                return consumer.receive( TIMEOUT );
+                // Block on receiving the response with a timeout                
+                return consumer.receive(TIMEOUT);
             }
+            catch(Exception ex)
+            {
+                ex.printStackTrace();
+                return session.createTextMessage("vyskytla se chyba");
+            }
+                    
             finally {
                 // Don't forget to close your resources
                 JmsUtils.closeMessageConsumer( consumer );
@@ -89,12 +97,13 @@ public class Requestor {
     }
  
     private final JmsTemplate jmsTemplate;
- 
     @Autowired
-    public Requestor( final JmsTemplate jmsTemplate) {
-      
-        this.jmsTemplate = jmsTemplate;
+    public SyncMessageConnector(ConfigurableApplicationContext context) {
+        this.context = context;
+        this.jmsTemplate = this.context.getBean(JmsTemplate.class);
      }
+
+            
 
     public String request( final String request, String queue ) throws JMSException {
         // Must pass true as the second param to start the connection
@@ -103,12 +112,14 @@ public class Requestor {
         if(response instanceof ActiveMQTextMessage)
         {
             ActiveMQTextMessage nresponse = (ActiveMQTextMessage) response;
-            log.info("prijata zprava: " + nresponse.getText();)
+            log.info("prijata zprava: " + nresponse.getText());
             return nresponse.getText();
         }
         else 
-        {
-            log.severe("Invalid objects in response");
+        {            
+            log.fatal("Invalid objects in response");
+            if(response != null)
+                log.info(response.getClass().getName());
             return null;
         }
     }

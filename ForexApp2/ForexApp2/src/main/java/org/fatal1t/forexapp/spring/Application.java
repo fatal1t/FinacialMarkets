@@ -5,9 +5,11 @@
  */
 package org.fatal1t.forexapp.spring;
 
-import org.fatal1t.forexapp.spring.testing.Requestor;
-import fhl.main.adapters.APIStreamingAdapter;
-import fhl.main.adapters.APISyncAdapter;
+import com.thoughtworks.xstream.XStream;
+import fhl.main.adapters.sync.requests.GetUserDataReq;
+import org.fatal1t.forexapp.spring.testing.SyncMessageConnector;
+import org.fatal1t.forexapp.spring.adapters.APIStreamingAdapter;
+import org.fatal1t.forexapp.spring.adapters.APISyncAdapter;
 import java.io.File;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -36,7 +38,8 @@ public class Application {
         SimpleJmsListenerContainerFactory factory = new SimpleJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         return factory;
-    }
+        }
+        
     /**
      * @param args the command line arguments
      */
@@ -48,18 +51,20 @@ public class Application {
 
         // Launch the application
         ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
-        Requestor r = new Requestor(context.getBean(JmsTemplate.class));
-        System.out.println("Prijato: " + r.request("Ahoj vole", "test.filip"));
-        /*
-        APISyncAdapter syncAdapter = APISyncAdapter.GetAdapter("DEMO", context);
-        SessionLoader loader = new SessionLoader(syncAdapter);
+        //APISyncAdapter syncAdapter = APISyncAdapter.GetAdapter("DEMO");
+        //SessionLoader loader = new SessionLoader(syncAdapter);
         log.info("Session is loaded");
         
+        GetUserDataReq request = new GetUserDataReq();
+        
+        SyncMessageConnector sync = new SyncMessageConnector(context);
+        XStream xs = new XStream();
+        sync.request(xs.toXML(request), "forex.sync.getuserdata");
 
         // Send a message
-        APIStreamingAdapter adapter = new APIStreamingAdapter(context);
-        adapter.start(org.fatal1t.forexapp.session.AppSession.getSession());
-        // TODO code application logic here*/
+        //APIStreamingAdapter adapter = new APIStreamingAdapter();
+        //adapter.start(org.fatal1t.forexapp.session.AppSession.getSession());
+        // TODO code application logic here
     }
     
 }
