@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.adapters;
+package org.fatal1t.forexapp.spring.api.adapters;
 
 import java.io.IOException;
 import java.util.ArrayList;

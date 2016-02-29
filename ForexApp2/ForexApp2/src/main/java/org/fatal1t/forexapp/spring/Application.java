@@ -6,13 +6,16 @@
 package org.fatal1t.forexapp.spring;
 
 import com.thoughtworks.xstream.XStream;
-import fhl.main.adapters.sync.requests.GetUserDataReq;
-import org.fatal1t.forexapp.spring.testing.SyncMessageConnector;
-import org.fatal1t.forexapp.spring.adapters.APIStreamingAdapter;
-import org.fatal1t.forexapp.spring.adapters.APISyncAdapter;
+import org.fatal1t.forexapp.spring.api.requests.GetUserDataReq;
+import org.fatal1t.forexapp.spring.services.common.SyncMessageConnector;
+import org.fatal1t.forexapp.spring.api.adapters.APIStreamingAdapter;
+import org.fatal1t.forexapp.spring.api.adapters.APISyncAdapter;
 import java.io.File;
+import java.util.UUID;
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.fatal1t.forexapp.session.SessionLoader;
@@ -25,6 +28,7 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.config.SimpleJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.util.FileSystemUtils;
 /**
  *
@@ -44,6 +48,19 @@ public class Application {
      * @param args the command line arguments
      */
         static final Logger log = LogManager.getLogger(Application.class);
+    static public void respond(String message, String CorelId, String queue,JmsTemplate jmsTemplate )
+    {
+        
+        MessageCreator messageCreator = (javax.jms.Session session1) -> {
+            Message nMessage = session1.createTextMessage(message);            
+            nMessage.setJMSCorrelationID(CorelId);
+            return nMessage;
+        };
+        
+        jmsTemplate.send(queue, messageCreator);
+        
+        log.fatal("Odeslana zprava: "+ message);
+    } 
 
     public static void main(String[] args) throws JMSException {        
         // Clean out any ActiveMQ data from a previous run
@@ -56,11 +73,14 @@ public class Application {
         log.info("Session is loaded");
         
         GetUserDataReq request = new GetUserDataReq();
+        XStream xs = new XStream();
+        JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
+
+        //respond(xs.toXML(request), UUID.randomUUID().toString(), "forex.sync.getuserdata.request", jmsTemplate );
         
         SyncMessageConnector sync = new SyncMessageConnector(context);
-        XStream xs = new XStream();
-        sync.request(xs.toXML(request), "forex.sync.getuserdata");
-
+        sync.request(xs.toXML(request), "forex.sync.connector");
+ 
         // Send a message
         //APIStreamingAdapter adapter = new APIStreamingAdapter();
         //adapter.start(org.fatal1t.forexapp.session.AppSession.getSession());

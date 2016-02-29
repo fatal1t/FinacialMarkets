@@ -3,18 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.adapters;
+package org.fatal1t.forexapp.spring.api.adapters;
 
-import fhl.main.adapters.sync.requests.LoginReq;
-import fhl.main.adapters.sync.responses.GetAllSymbolsResponse;
-import fhl.main.adapters.sync.responses.GetUserDataResp;
-import fhl.main.adapters.sync.responses.LoginResp;
+import org.fatal1t.forexapp.spring.api.requests.LoginReq;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetAllSymbolsResponse;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
+import org.fatal1t.forexapp.spring.api.adapters.responses.LoginResp;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.stereotype.Component;
 import pro.xstore.api.message.command.APICommandFactory;

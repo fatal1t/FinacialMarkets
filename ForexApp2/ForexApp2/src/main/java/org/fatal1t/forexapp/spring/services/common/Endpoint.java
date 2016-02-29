@@ -13,7 +13,7 @@ import javax.jms.TextMessage;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
-import org.fatal1t.forexapp.spring.services.getuserdata.GetUserDataService;
+import org.fatal1t.forexapp.spring.services.sync.GetUserDataService;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;

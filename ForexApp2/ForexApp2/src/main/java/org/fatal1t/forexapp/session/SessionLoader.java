@@ -5,10 +5,10 @@
  */
 package org.fatal1t.forexapp.session;
 
-import org.fatal1t.forexapp.spring.adapters.APISyncAdapter;
-import fhl.main.adapters.sync.requests.LoginReq;
-import fhl.main.adapters.sync.responses.GetUserDataResp;
-import fhl.main.adapters.sync.responses.LoginResp;
+import org.fatal1t.forexapp.spring.api.adapters.APISyncAdapter;
+import org.fatal1t.forexapp.spring.api.requests.LoginReq;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
+import org.fatal1t.forexapp.spring.api.adapters.responses.LoginResp;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

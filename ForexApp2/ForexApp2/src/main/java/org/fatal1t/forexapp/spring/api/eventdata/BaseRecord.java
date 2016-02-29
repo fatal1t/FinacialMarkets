@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.adapters.sync.requests;
+package org.fatal1t.forexapp.spring.api.eventdata;
 
 /**
  *
  * @author Filip
  */
-public class GetUserDataReq {
+public class BaseRecord {
     
 }

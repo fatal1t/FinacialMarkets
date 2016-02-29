@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.testing;
+package org.fatal1t.forexapp.spring.services.common;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -18,12 +19,9 @@ import javax.jms.TextMessage;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.log4j.LogManager;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.destination.DestinationResolver;
@@ -37,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class SyncMessageConnector {
     
     @Autowired
-    private ConfigurableApplicationContext context;
+    private final ConfigurableApplicationContext context;
     private static final Logger log = LogManager.getLogger(SyncMessageConnector.class.getName());
     private static final class ProducerConsumer implements SessionCallback<Message> {
  
@@ -67,6 +65,9 @@ public class SyncMessageConnector {
                         destinationResolver.resolveDestinationName( session, queue+".response", false );
                 // Create the consumer first!
                 consumer = session.createConsumer( replyQueue, "JMSCorrelationID = '" + correlationId + "'" );
+                MessageObserver observer = new MessageObserver();
+                MessageListener listener =  new MessageListenerImpl(observer);
+                consumer.setMessageListener(listener);
                 log.info("Target queue: " + requestQueue.toString());
                 log.info("Reply queue: " + replyQueue.toString());
                 final TextMessage textMessage = session.createTextMessage( msg );
@@ -76,12 +77,29 @@ public class SyncMessageConnector {
                 log.info("Sending message:" + msg);
                 producer = session.createProducer( requestQueue );
                 producer.send( requestQueue, textMessage );
-                // Block on receiving the response with a timeout                
-                return consumer.receive(TIMEOUT);
+                // Block on receiving the response with a timeout   
+                long startTime  = System.nanoTime();
+                while(observer.getMessage() == null)
+                {
+                    long seconds = TimeUnit.SECONDS.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+                    observer.waitMessage();
+                    if(seconds < 30 )
+                    {
+                        if(observer.getMessage() != null)
+                        {
+                            break;                            
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+
+                return observer.getMessage();
             }
-            catch(Exception ex)
+            catch(JMSException | InterruptedException ex)
             {
-                ex.printStackTrace();
                 return session.createTextMessage("vyskytla se chyba");
             }
                     

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.adapters.sync.responses;
+package org.fatal1t.forexapp.spring.api.adapters.responses;
 
 import org.fatal1t.forexapp.session.UserData;
 

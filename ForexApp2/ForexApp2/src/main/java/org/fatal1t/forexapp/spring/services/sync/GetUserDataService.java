@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.services.getuserdata;
+package org.fatal1t.forexapp.spring.services.sync;
 
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -11,7 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 import org.fatal1t.forexapp.spring.services.common.Endpoint;
-import org.fatal1t.forexapp.spring.testing.SyncMessageConnector;
+import org.fatal1t.forexapp.spring.services.common.SyncMessageConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.annotation.JmsListener;
@@ -38,7 +38,7 @@ public class GetUserDataService extends Endpoint{
         this.connector = new SyncMessageConnector(context);
     }
 
-    @JmsListener(destination =  "forex.sync.getuserdata.request", containerFactory = "myJmsContainerFactory")
+    @JmsListener(destination = "forex.sync.getuserdata.request", containerFactory = "myJmsContainerFactory")
     @Override
     public void listen(TextMessage message) {
         try {

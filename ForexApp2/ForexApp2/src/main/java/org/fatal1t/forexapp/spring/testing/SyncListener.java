@@ -6,13 +6,13 @@
 package org.fatal1t.forexapp.spring.testing;
 
 import com.thoughtworks.xstream.XStream;
-import fhl.main.adapters.sync.responses.GetUserDataResp;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 import org.fatal1t.forexapp.session.AppSession;
-import org.fatal1t.forexapp.spring.adapters.APISyncAdapter;
+import org.fatal1t.forexapp.spring.api.adapters.APISyncAdapter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;

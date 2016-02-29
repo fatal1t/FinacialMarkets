@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fhl.main.adapters.stream.eventdata;
+package org.fatal1t.forexapp.spring.api.eventdata;
 
 /**
  *
  * @author Filip
  */
-public class BalanceRecord extends BaseRecord {
+public class NewsRecord {
     
 }
