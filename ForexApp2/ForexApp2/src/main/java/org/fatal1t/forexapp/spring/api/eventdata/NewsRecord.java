@@ -9,6 +9,6 @@ package org.fatal1t.forexapp.spring.api.eventdata;
  *
  * @author Filip
  */
-public class NewsRecord {
+public class NewsRecord extends BaseRecord{
     
 }

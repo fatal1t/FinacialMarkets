@@ -11,16 +11,17 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.fatal1t.forexapp.session.AppSession;
 import org.fatal1t.forexapp.session.SessionLocal;
-import org.springframework.beans.BeansException;
+import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.TickRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.EnableJms;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
@@ -33,6 +34,7 @@ import pro.xstore.api.message.response.LoginResponse;
 import pro.xstore.api.streaming.StreamingListener;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.SyncAPIConnector;
+import org.fatal1t.forexapp.spring.api.eventdata.TickRecord;
 
 /**
  *
@@ -43,7 +45,9 @@ import pro.xstore.api.sync.SyncAPIConnector;
 public class APIStreamingAdapter extends Thread {
     @Autowired
     ConfigurableApplicationContext context;
-    private String TickQueueName = "mailbox-destination";
+    
+    private AsyncConnector connector;
+    private final Logger log = LogManager.getLogger(APIStreamingAdapter.class.getName());
     private SessionLocal session;
     private boolean IsLoggedIn;
     public boolean isConnected;
@@ -51,16 +55,17 @@ public class APIStreamingAdapter extends Thread {
     private SyncAPIConnector candlesConnector;
     private SyncAPIConnector newsConnector;
 
-    public APIStreamingAdapter() {
-        
+    @PostConstruct
+    private void init()
+    {
+        this.connector = this.context.getBean(AsyncConnector.class);
     }
-    
 
 
-    public void start(SessionLocal lsession)
+    @Override
+    public void start()
     {  
         this.session = AppSession.getSession();
-        sendMessage("Ahoj, vole", TickQueueName);
         initate();
         try {
             
@@ -72,14 +77,15 @@ public class APIStreamingAdapter extends Thread {
             final StreamingListener tickListener = new StreamingListener() {
                 @Override
                 public void receiveTickRecord(STickRecord tickRecord) {
-                    System.out.println("Stream tick record: " + tickRecord.getSymbol());
-                    /*adapter.getTickRecord(new TickRecord(tickRecord.getAsk(),
-                            tickRecord.getBid(), tickRecord.getAskVolume(), tickRecord.getBidVolume(),
-                            tickRecord.getHigh(), tickRecord.getLow(), tickRecord.getSpreadRaw(),
-                            tickRecord.getSpreadTable(), tickRecord.getSymbol(),
-                            tickRecord.getQuoteId(), tickRecord.getLevel(), tickRecord.getTimestamp()));                */    
-                        }                  
-                };                       
+                    TickRecord record = new TickRecord(tickRecord.getAsk(),
+                        tickRecord.getBid(), tickRecord.getAskVolume(), tickRecord.getBidVolume(),
+                        tickRecord.getHigh(), tickRecord.getLow(), tickRecord.getSpreadRaw(),
+                        tickRecord.getSpreadTable(), tickRecord.getSymbol(),
+                        tickRecord.getQuoteId(), tickRecord.getLevel(), tickRecord.getTimestamp());
+                 log.info("Async: prijata zprava: " + record.getSymbol() );
+                 connector.sendMessage(record);
+                }
+            };                       
             this.tickConnector.connectStream(tickListener);
             this.tickConnector.subscribePrices(symbols);
             final StreamingListener candlesListener = new StreamingListener()
@@ -87,11 +93,15 @@ public class APIStreamingAdapter extends Thread {
               @Override
               public void receiveCandleRecord(SCandleRecord candleRecord)
               {
+                  
+                  CandleDataRecord record = new CandleDataRecord(candleRecord.getCtm(), candleRecord.getCtmString(), 
+                          candleRecord.getOpen(), candleRecord.getHigh(), candleRecord.getLow(), candleRecord.getClose(), 
+                          candleRecord.getVol(), candleRecord.getQuoteId(), candleRecord.getSymbol());
+                  log.info("Async: prijata zprava: " + record.getSymbol() );
+                  connector.sendMessage(record);
                   //GeneralLog.getLog().WriteToLog("Stream candle record: " + candleRecord.getSymbol());
                   //System.out.println("Stream candle record: " + candleRecord.getSymbol());
-                  //      manager.getQueue("CandleDataQueue").insertToQueue(new CandleDataRecord(candleRecord.getCtm(), candleRecord.getCtmString(), 
-                    //      candleRecord.getOpen(), candleRecord.getHigh(), candleRecord.getLow(), candleRecord.getClose(), 
-                      //    candleRecord.getVol(), candleRecord.getQuoteId(), candleRecord.getSymbol()));
+                  //      manager.getQueue("CandleDataQueue").insertToQueue();
                   
               }
             };
@@ -118,7 +128,8 @@ public class APIStreamingAdapter extends Thread {
                             candlesConnector.connectStream(candlesListener);
                             candlesConnector.subscribeCandles(symbols);
                         } catch (IOException | APICommunicationException ex1) {
-                            Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex1);
+                           log.fatal(ex1.getStackTrace());
+                           
                         }
                     }
 
@@ -126,16 +137,10 @@ public class APIStreamingAdapter extends Thread {
             }, 300000, 300000);
         } catch (IOException | APICommunicationException ex) {
             ex.printStackTrace();
-            Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }        
     }
 
-    private void sendMessage(String message, String queue) throws JmsException, BeansException {
-        MessageCreator messageCreator = (javax.jms.Session session1) -> session1.createTextMessage(message);
-        JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
-        System.out.println("Sending a new message.");
-        jmsTemplate.send(queue, messageCreator);
-    }
+
     
     
     public void initate()
@@ -167,11 +172,9 @@ public class APIStreamingAdapter extends Thread {
             }
         }
         catch (IOException | APICommandConstructionException | APICommunicationException | APIReplyParseException ex) {
-            Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         } catch (APIErrorResponse ex) {
             System.out.println(ex.getMessage());            
-            Logger.getLogger(APIStreamingAdapter.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }

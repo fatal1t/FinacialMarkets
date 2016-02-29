@@ -5,23 +5,18 @@
  */
 package org.fatal1t.forexapp.spring;
 
-import com.thoughtworks.xstream.XStream;
-import org.fatal1t.forexapp.spring.api.requests.GetUserDataReq;
-import org.fatal1t.forexapp.spring.services.common.SyncMessageConnector;
 import org.fatal1t.forexapp.spring.api.adapters.APIStreamingAdapter;
-import org.fatal1t.forexapp.spring.api.adapters.APISyncAdapter;
 import java.io.File;
-import java.util.UUID;
+import javax.activation.DataSource;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.fatal1t.forexapp.session.SessionLoader;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jms.annotation.EnableJms;
@@ -43,6 +38,7 @@ public class Application {
         factory.setConnectionFactory(connectionFactory);
         return factory;
         }
+        
         
     /**
      * @param args the command line arguments
@@ -72,18 +68,18 @@ public class Application {
         //SessionLoader loader = new SessionLoader(syncAdapter);
         log.info("Session is loaded");
         
-        GetUserDataReq request = new GetUserDataReq();
-        XStream xs = new XStream();
-        JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
+        //GetUserDataReq request = new GetUserDataReq();
+        //XStream xs = new XStream();
+        //JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
 
         //respond(xs.toXML(request), UUID.randomUUID().toString(), "forex.sync.getuserdata.request", jmsTemplate );
         
-        SyncMessageConnector sync = new SyncMessageConnector(context);
-        sync.request(xs.toXML(request), "forex.sync.connector");
+        //SyncMessageConnector sync = new SyncMessageConnector(context);
+        //sync.request(xs.toXML(request), "forex.sync.connector");
  
         // Send a message
-        //APIStreamingAdapter adapter = new APIStreamingAdapter();
-        //adapter.start(org.fatal1t.forexapp.session.AppSession.getSession());
+        APIStreamingAdapter adapter = context.getBean(APIStreamingAdapter.class);
+        adapter.start();
         // TODO code application logic here
     }
     

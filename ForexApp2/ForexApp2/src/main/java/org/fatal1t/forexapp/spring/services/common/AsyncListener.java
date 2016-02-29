@@ -5,6 +5,7 @@
  */
 package org.fatal1t.forexapp.spring.services.common;
 
+import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
 /**
@@ -14,7 +15,7 @@ import javax.jms.TextMessage;
 public interface AsyncListener {
     
     
-    public void listen(TextMessage message);
+    public void listen(TextMessage message) throws JMSException;
     
     
     
