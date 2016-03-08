@@ -25,7 +25,15 @@ class MessageObserver {
     }
     public void waitMessage() throws InterruptedException
     {
-        Thread.sleep(10);
+        while(this.message == null)
+        {            
+            Thread.sleep(1000);
+            if(this.message != null)
+                break;
+            else
+                continue;
+        }
+        
     }
     public TextMessage getMessage() {
         return message;

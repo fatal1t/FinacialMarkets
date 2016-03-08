@@ -8,20 +8,20 @@ package org.fatal1t.forexapp.spring.api.adapters.responses;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.fatal1t.forexapp.session.SymbolTradingHours;
+import org.fatal1t.forexapp.spring.session.SymbolTradingHours;
 
 /**
  *
  * @author Filip
  */
-public class GetTradingHoursResponse {
-    private List<SymbolTradingHours> symbolTradingHoursList;
+public class GetTradingHoursResp {
+    private final List<SymbolTradingHours> symbolTradingHoursList;
 
     public List<SymbolTradingHours> getSymbolTradingHoursList() {
         return symbolTradingHoursList;
     }
 
-    public GetTradingHoursResponse() {
+    public GetTradingHoursResp() {
         this.symbolTradingHoursList = new ArrayList<>();
     }
     

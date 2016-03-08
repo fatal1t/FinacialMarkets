@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.session;
+package org.fatal1t.forexapp.spring.session;
 
 import java.util.List;
 import pro.xstore.api.sync.ServerData;
@@ -22,15 +22,15 @@ public class Configuration {
     private List<String> usedSymbols;
     public Configuration()
     {
-        this.username = "572707";
-        this.password = "ab45d639";
+        this.username = "599627";
+        this.password = "a4210a80";
         this.serverType = ServerData.ServerEnum.DEMO;
         
     }
     public Configuration(String user, String password, String Server, boolean isLogged)
     {
-        this.username = "495753";
-        this.password = "e83f7cea";
+        this.username = "599627";
+        this.password = "a4210a80";
         this.serverType = ServerData.ServerEnum.DEMO;
         
     }

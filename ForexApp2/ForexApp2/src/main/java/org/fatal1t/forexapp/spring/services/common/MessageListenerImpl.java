@@ -13,20 +13,22 @@ import javax.jms.TextMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.springframework.jms.annotation.JmsListener;
 
 /**
  *
  * @author Filip
  */
 public class MessageListenerImpl implements MessageListener{
-    private static Logger log = LogManager.getLogger("MessageListener");
+    private static final Logger log = LogManager.getLogger("MessageListener");
 
-    private MessageObserver observer;
+    private final MessageObserver observer;
     
     public MessageListenerImpl(MessageObserver observer)
     {
         this.observer = observer;
     }
+    @JmsListener(destination = "forex.sync.listener.connector.response",  containerFactory = "myJmsContainerFactory")
     @Override
     public void onMessage(Message message) {
         try {
@@ -43,7 +45,7 @@ public class MessageListenerImpl implements MessageListener{
                     log.fatal("nespravny format message" + message.getJMSCorrelationID());                ;
                     eMessage.setText("Chyba pri prijmani zpravy");
                 } catch (JMSException ex) {
-                    java.util.logging.Logger.getLogger(MessageListenerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    log.fatal(ex.getStackTrace());
                 }
                 this.observer.notify(eMessage);
             }

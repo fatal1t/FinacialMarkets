@@ -5,25 +5,35 @@
  */
 package org.fatal1t.forexapp.spring.api.adapters;
 
-import org.fatal1t.forexapp.spring.api.requests.LoginReq;
-import org.fatal1t.forexapp.spring.api.adapters.responses.GetAllSymbolsResponse;
+import org.fatal1t.forexapp.spring.api.adapters.requests.LoginReq;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetAllSymbolsResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.LoginResp;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.Time;
+
+import java.util.List;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import org.fatal1t.forexapp.spring.session.HourData;
+import org.fatal1t.forexapp.spring.session.SymbolTradingHours;
+import org.fatal1t.forexapp.spring.api.adapters.requests.GetTradingHoursReq;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradingHoursResp;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.stereotype.Component;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
+import pro.xstore.api.message.records.HoursRecord;
 import pro.xstore.api.message.response.APIErrorResponse;
 import pro.xstore.api.message.response.AllSymbolsResponse;
 import pro.xstore.api.message.response.CurrentUserDataResponse;
 import pro.xstore.api.message.response.LoginResponse;
 import pro.xstore.api.message.response.LogoutResponse;
+import pro.xstore.api.message.response.TradingHoursResponse;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.ServerData;
 import pro.xstore.api.sync.SyncAPIConnector;
@@ -34,11 +44,12 @@ import pro.xstore.api.sync.SyncAPIConnector;
  */
 @EnableJms
 @Component
-public class APISyncAdapter  {
+public final class APISyncAdapter  {
     
     private boolean IsLoggedIn;
     private String ServerType;
     public boolean isConnected;
+    private final Logger log = LogManager.getLogger(this.getClass().getName());
     private SyncAPIConnector connector;    
 
     public String getServerType() {
@@ -84,7 +95,7 @@ public class APISyncAdapter  {
             this.ServerType = ServerType1;
         }catch (IOException ex) {
             this.isConnected = false;
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         }
     }
     
@@ -93,7 +104,7 @@ public class APISyncAdapter  {
         try {
             connector.close();
         } catch (APICommunicationException ex) {
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         }
     }
     
@@ -107,10 +118,10 @@ public class APISyncAdapter  {
                 return new LoginResp(true);
             }
         } catch (IOException | APICommandConstructionException | APICommunicationException | APIReplyParseException ex) {
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         } catch (APIErrorResponse ex) {
             System.out.println(ex.getMessage());
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         }
         return new LoginResp(false);
     }
@@ -119,26 +130,26 @@ public class APISyncAdapter  {
         try {
             LogoutResponse response = APICommandFactory.executeLogoutCommand(connector);
         } catch (APICommandConstructionException | APICommunicationException | APIReplyParseException ex) {
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         } catch (APIErrorResponse ex) {
             System.out.println(ex.getMessage());
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         }
     }
-    public GetAllSymbolsResponse GetAllSymbols()
+    public GetAllSymbolsResp GetAllSymbols()
     {
         try {
             AllSymbolsResponse response =  APICommandFactory.executeAllSymbolsCommand(connector);
-            GetAllSymbolsResponse resp = new GetAllSymbolsResponse();
+            GetAllSymbolsResp resp = new GetAllSymbolsResp();
             response.getSymbolRecords().stream().forEach((rec) -> {
                 resp.AddSymbol(rec);
             });
             return resp;
         } catch (APICommandConstructionException | APIReplyParseException | APICommunicationException ex) {
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         } catch (APIErrorResponse ex) {
             System.out.println(ex.getMessage());
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         }
         return null;                
     }    
@@ -159,7 +170,7 @@ public class APISyncAdapter  {
                     response.getSpreadType());                
                     
         } catch (APICommandConstructionException | APICommunicationException | APIReplyParseException  ex) {
-            Logger.getLogger(APISyncAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            log.fatal("error");
         }
         catch( APIErrorResponse exp)
         {
@@ -191,14 +202,16 @@ public class APISyncAdapter  {
     {
         
     }
-    /*
-    public GetTradingHoursResponse GetTradingHours(List<String> symbols)
+    
+    public GetTradingHoursResp GetTradingHours(GetTradingHoursReq request)
     {
-        GetTradingHoursResponse data = null;
+        List<String> symbols = request.getSymbols();
+        GetTradingHoursResp data = null;
         try
         {
             TradingHoursResponse response = APICommandFactory.executeTradingHoursCommand(connector, symbols);
-            data = new GetTradingHoursResponse();
+            data = new GetTradingHoursResp();
+            log.info("Prijata data: "+ data.toString());
             for(String symbol : response.getSymbols())
             {
                 SymbolTradingHours hours = new SymbolTradingHours(symbol);
@@ -227,11 +240,12 @@ public class APISyncAdapter  {
         }
         catch(APICommandConstructionException | APICommunicationException | APIReplyParseException | APIErrorResponse ex)
         {
-            
+                        log.fatal("error v komunikaci ");
+                        log.fatal(ex);
         }
         return data;
     }    
-    */
+    
     public void GetVersion()
     {
         

@@ -3,12 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.api.requests;
+package org.fatal1t.forexapp.spring.session;
+
 
 /**
  *
  * @author Filip
  */
-public class GetUserDataReq {
+
+public interface SessionLocal {
+    public void readConfiguration();
+    public Configuration getConfiguration();
     
 }

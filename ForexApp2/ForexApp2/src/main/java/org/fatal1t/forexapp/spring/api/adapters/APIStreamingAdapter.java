@@ -10,15 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.fatal1t.forexapp.session.AppSession;
-import org.fatal1t.forexapp.session.SessionLocal;
+import org.fatal1t.forexapp.spring.session.AppSession;
+import org.fatal1t.forexapp.spring.session.SessionLocal;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
-import org.fatal1t.forexapp.spring.api.eventdata.TickRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.annotation.EnableJms;

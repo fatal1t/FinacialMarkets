@@ -5,6 +5,7 @@
  */
 package org.fatal1t.forexapp.spring.services.dblog;
 
+import java.sql.PreparedStatement;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,16 @@ public class DbMessageLog {
     
     @JmsListener(destination = "forex.infrastructure.log", containerFactory = "myJmsContainerFactory")
     public void listen(TextMessage message) throws JMSException{
-        jdbcTemplate.
-
         
+        LogRecordRepository repo = this.context.getBean(LogRecordRepository.class);
+        LogRecord record =new LogRecord();
+        record.setCorrelId(message.getJMSCorrelationID());
+        
+        record.setCurrComponent(message.getStringProperty("service"));
+        record.setRequest(message.getText());
+        record.setSID(message.getJMSMessageID());
+        record.setSourceQueue(message.getStringProperty("sourceQueue"));
+        record.setTargetQueue(message.getJMSReplyTo().toString());
+        repo.save(record);
     }
 }

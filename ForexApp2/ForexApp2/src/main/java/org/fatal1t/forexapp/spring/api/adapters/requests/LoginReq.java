@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.api.requests;
+package org.fatal1t.forexapp.spring.api.adapters.requests;
 
 /**
  *

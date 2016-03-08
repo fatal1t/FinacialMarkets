@@ -18,8 +18,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class AsyncService implements AsyncListener{
 
     @Autowired
-    private ConfigurableApplicationContext context;
-    private List< AsyncServiceObserver> observers;
+    protected ConfigurableApplicationContext context;
+    protected List< AsyncServiceObserver> observers;
     @Override
     public void listen(TextMessage message) throws JMSException {
         

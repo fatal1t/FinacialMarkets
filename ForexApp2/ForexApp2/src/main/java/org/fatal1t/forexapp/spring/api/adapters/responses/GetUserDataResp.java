@@ -5,7 +5,7 @@
  */
 package org.fatal1t.forexapp.spring.api.adapters.responses;
 
-import org.fatal1t.forexapp.session.UserData;
+import org.fatal1t.forexapp.spring.session.UserData;
 
 
 

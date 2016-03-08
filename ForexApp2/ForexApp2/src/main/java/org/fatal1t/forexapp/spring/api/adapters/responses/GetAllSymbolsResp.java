@@ -8,18 +8,18 @@ package org.fatal1t.forexapp.spring.api.adapters.responses;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.fatal1t.forexapp.session.SymbolData;
+import org.fatal1t.forexapp.spring.session.SymbolData;
 import pro.xstore.api.message.records.SymbolRecord;
 
 /**
  *
  * @author Filip
  */
-public class GetAllSymbolsResponse {
+public class GetAllSymbolsResp {
     
     private final List<SymbolData> symbols;
 
-    public GetAllSymbolsResponse() {
+    public GetAllSymbolsResp() {
         this.symbols = new ArrayList<>();
     }
     
@@ -40,5 +40,12 @@ public class GetAllSymbolsResponse {
     public List<SymbolData> getSymbols() {
         return symbols;
     }
-    
+    public List<String> getSymbolsList()
+    {
+        List<String> list = new ArrayList<>();
+        this.symbols.forEach((SymbolData item) -> {
+           list.add(item.getSymbol());
+        });
+        return list;
+    }
 }
