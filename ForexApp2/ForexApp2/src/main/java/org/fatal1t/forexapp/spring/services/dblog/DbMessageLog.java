@@ -36,7 +36,8 @@ public class DbMessageLog {
         record.setRequest(message.getText());
         record.setSID(message.getJMSMessageID());
         record.setSourceQueue(message.getStringProperty("sourceQueue"));
-        record.setTargetQueue(message.getJMSReplyTo().toString());
+        String replyTo = message.getJMSReplyTo() != null ?  message.getJMSReplyTo().toString() : "no reply to Queue";
+        record.setTargetQueue(replyTo);
         repo.save(record);
     }
 }

@@ -6,8 +6,6 @@
 package org.fatal1t.forexapp.spring.services.sync;
 
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
@@ -63,5 +61,4 @@ public class GetAllSymbolsService extends Endpoint {
          log(message, "GetTradingHoursService");
         //log.info(message.getText().substring(0, 100));
     }
-    
 }

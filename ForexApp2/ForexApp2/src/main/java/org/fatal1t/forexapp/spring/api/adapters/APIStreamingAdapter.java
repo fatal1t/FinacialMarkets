@@ -70,7 +70,8 @@ public class APIStreamingAdapter extends Thread {
             List<String> testSymbols = new ArrayList<>();
             List<String> symbols;
             testSymbols.add("EURUSD");
-            testSymbols.add("RU5S0");
+            testSymbols.add("EURGBP");
+            testSymbols.add("EURCZK");
             symbols = testSymbols;
             final StreamingListener tickListener = new StreamingListener() {
                 @Override
@@ -80,8 +81,8 @@ public class APIStreamingAdapter extends Thread {
                         tickRecord.getHigh(), tickRecord.getLow(), tickRecord.getSpreadRaw(),
                         tickRecord.getSpreadTable(), tickRecord.getSymbol(),
                         tickRecord.getQuoteId(), tickRecord.getLevel(), tickRecord.getTimestamp());
-                 log.info("Async: prijata zprava: " + record.getSymbol() );
-                 connector.sendMessage(record);
+                 //log.info("Async: prijata zprava: " + record.getSymbol() );
+                 //connector.sendMessage(record);
                 }
             };                       
             this.tickConnector.connectStream(tickListener);
@@ -90,8 +91,7 @@ public class APIStreamingAdapter extends Thread {
             {
               @Override
               public void receiveCandleRecord(SCandleRecord candleRecord)
-              {
-                  
+              {                  
                   CandleDataRecord record = new CandleDataRecord(candleRecord.getCtm(), candleRecord.getCtmString(), 
                           candleRecord.getOpen(), candleRecord.getHigh(), candleRecord.getLow(), candleRecord.getClose(), 
                           candleRecord.getVol(), candleRecord.getQuoteId(), candleRecord.getSymbol());

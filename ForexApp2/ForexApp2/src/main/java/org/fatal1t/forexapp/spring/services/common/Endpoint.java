@@ -8,6 +8,7 @@ package org.fatal1t.forexapp.spring.services.common;
 
 import javax.jms.Destination;
 import javax.jms.Message;
+import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -65,18 +66,17 @@ public abstract class Endpoint {
         log.info("Target queue: " + queue);
         log.info("Odeslana zprava: "+ message.substring(0,50));
     } 
-    
-    public void log(TextMessage message, String service)
-    {
-         MessageCreator messageCreator = (javax.jms.Session session1) -> {
-            Message nMessage = session1.createTextMessage(message.getText());                
+    public void log(TextMessage message, String service) {
+        MessageCreator messageCreator = (Session session1) -> {
+            Message nMessage = session1.createTextMessage(message.getText());
             nMessage.setJMSType(message.getJMSType());
             nMessage.setJMSCorrelationID(message.getJMSCorrelationID());
             nMessage.setJMSReplyTo(message.getJMSReplyTo());
             nMessage.setStringProperty("service", service);
             nMessage.setStringProperty("sourceQueue", message.getJMSDestination().toString());
             return nMessage;
-         };
+        };
         this.jmsTemplate.send(logQueue, messageCreator);
     }
+    
 }

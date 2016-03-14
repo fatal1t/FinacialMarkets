@@ -6,22 +6,13 @@
 package org.fatal1t.forexapp.spring.session;
 
 import org.fatal1t.forexapp.spring.api.adapters.APISyncAdapter;
-import org.fatal1t.forexapp.spring.api.adapters.requests.LoginReq;
-import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
-import org.fatal1t.forexapp.spring.api.adapters.responses.LoginResp;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.jms.annotation.EnableJms;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Filip
  */
-//@EnableJms
-//@Component
 public class SessionLoader {
 
     static final Logger log = LogManager.getLogger(SessionLoader.class.getName());

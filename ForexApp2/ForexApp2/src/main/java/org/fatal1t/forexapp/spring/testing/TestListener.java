@@ -25,7 +25,7 @@ public class TestListener {
     private final Logger log = LogManager.getLogger(TestListener.class.getName());
 
     
-    @JmsListener(destination = "forex.sync.listener.connector.response.testing",  containerFactory = "myJmsContainerFactory")
+    @JmsListener(destination = "forex.async.tick.candlestorage",  containerFactory = "myJmsContainerFactory")
     public void receiveMessage(TextMessage message) throws JMSException {
         log.info("Source Queue: "+message.getJMSDestination().toString());
         
