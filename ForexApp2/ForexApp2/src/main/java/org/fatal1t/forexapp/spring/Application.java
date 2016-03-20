@@ -88,17 +88,6 @@ import org.springframework.util.FileSystemUtils;
         // Send a message
         //APIStreamingAdapter adapter = context.getBean(APIStreamingAdapter.class);
         //adapter.start();
-        CandlesRepository repo = context.getBean(CandlesRepository.class);
-        Candle c = new Candle();
-        c.setClose(1.0);
-        c.setHigh(1.3);
-        c.setLow(0.8);
-        c.setOpen(1.1);
-        c.setQuoteId(1);
-        c.setSymbol("EURSUD");
-        c.setVol(2.0);
-        c.setTime(Timestamp.valueOf("2015-03-14 22:40:00"));
-        repo.save(c);
         ClientSessionManager manager = context.getBean(ClientSessionManager.class);
         manager.init();
         

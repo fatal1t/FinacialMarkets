@@ -54,3 +54,66 @@ CREATE TABLE forexdata.candlestemp(
     );
 GRANT INSERT ON  forexdata.candlestemp TO app;
  
+CREATE SEQUENCE forexdata.symbolsids 
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 26
+  CACHE 1;
+
+  
+CREATE TABLE forexdata.symbols
+(
+  id bigint NOT NULL DEFAULT nextval('forexdata.symbolsids'::regclass),
+  ask double precision,
+  bid double precision,
+  currency character varying(10),
+  currencypfoit character varying(10),
+  description character varying(200),
+  instantmaxvolume integer,
+  high double precision,
+  low double precision,
+  symbol character varying(20),
+  itime timestamp without time zone,
+  itype integer,
+  groupname character varying(20),
+  categoryname character varying(200),
+  bigintonly boolean,
+  starting bigint,
+  expiration bigint,
+  stepruleid integer,
+  stopslevel integer,
+  lotmax double precision,
+  lotmin double precision,
+  lotstep double precision,
+  iprecision integer,
+  cotranctsize bigint,
+  initialmargin bigint,
+  marginhedged double precision,
+  marginhedgedstrong boolean,
+  marginmaintanence bigint,
+  marginmode bigint,
+  percentage double precision,
+  profitmode bigint,
+  spreadraw double precision,
+  spreadtable double precision,
+  swapbigint double precision,
+  swapshort double precision,
+  swaptype bigint,
+  swaprollover bigint,
+  ticksize double precision,
+  tickvalue double precision,
+  quoteid integer,
+  leverage double precision,
+  ticks boolean,
+  CONSTRAINT symbols_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE forexdata.symbols
+  OWNER TO admin;
+GRANT ALL ON TABLE forexdata.symbols TO admin;
+GRANT SELECT, UPDATE, INSERT ON TABLE forexdata.symbols TO app;
+
+

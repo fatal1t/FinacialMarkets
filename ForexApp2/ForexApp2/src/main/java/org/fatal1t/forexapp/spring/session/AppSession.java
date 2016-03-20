@@ -5,6 +5,8 @@
  */
 package org.fatal1t.forexapp.spring.session;
 
+import java.util.List;
+
 
 /**
  *
@@ -15,6 +17,8 @@ package org.fatal1t.forexapp.spring.session;
 public class AppSession implements SessionLocal {
     private boolean isLoaded;
     private UserData userData;
+    private List<SymbolData> symbols;
+    private SymbolTradingHours tradingHours;
     private Configuration config = new Configuration();
     static private AppSession session;
 
@@ -60,4 +64,38 @@ public class AppSession implements SessionLocal {
     public void setUserData(UserData userData) {
         this.userData = userData;
     }
+
+    public boolean isIsLoaded() {
+        return isLoaded;
+    }
+
+    public void setIsLoaded(boolean isLoaded) {
+        this.isLoaded = isLoaded;
+    }
+
+    public List<SymbolData> getSymbols() {
+        return symbols;
+    }
+
+    public void setSymbols(List<SymbolData> symbols) {
+        this.symbols = symbols;
+    }
+
+    public SymbolTradingHours getTradingHours() {
+        return tradingHours;
+    }
+
+    public void setTradingHours(SymbolTradingHours tradingHours) {
+        this.tradingHours = tradingHours;
+    }
+
+    public Configuration getConfig() {
+        return config;
+    }
+
+    public void setConfig(Configuration config) {
+        this.config = config;
+    }
+    
+    
 }

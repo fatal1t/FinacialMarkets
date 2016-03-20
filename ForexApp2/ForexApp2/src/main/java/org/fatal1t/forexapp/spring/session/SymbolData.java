@@ -5,6 +5,8 @@
  */
 package org.fatal1t.forexapp.spring.session;
 
+import org.fatal1t.forexapp.spring.resources.db.Symbol;
+
 /**
  *
  * @author Filip
@@ -51,7 +53,54 @@ public class SymbolData {
     private final int quoteId;
     private final String timeString;
     private final double leverage;
+    
 
+    public SymbolData(Symbol record )
+    {
+        this.ask = record.getAsk();
+        this.bid = record.getBid();
+        this.categoryName = record.getCategoryName();
+        this.contractSize = record.getContractSize();
+        this.currency = record.getCurrency();
+        this.currencyProfit = record.getCurrencyProfit();
+        this.description = record.getDescription();
+        this.expiration = record.getExpiration();
+        this.groupName = record.getGroupName();
+        this.high = record.getHigh();
+        this.initialMargin = record.getInitialMargin();
+        this.instantMaxVolume = record.getInstantMaxVolume();
+        this.leverage = record.getLeverage();
+        this.lotMax = record.getLotMax();
+        this.lotMin = record.getLotMin();
+        this.lotStep = record.getLotStep();
+        this.longOnly = record.isLongOnly();
+        this.low = record.getLow();
+        this.marginHedged = record.getMarginHedged();
+        this.marginMaintenance = record.getMarginMaintenance();
+        this.marginHedgedStrong = record.isMarginHedgedStrong();
+        this.marginMode = record.getMarginMode();
+        this.percentage = record.getPercentage();
+        this.precision = record.getPrecision();
+        this.profitMode = record.getProfitMode();
+        this.quoteId = record.getQuoteId();
+        this.spreadRaw = record.getSpreadRaw();
+        this.spreadTable = record.getSpreadTable();
+        this.starting = record.getStarting();
+        this.stepRuleId = record.getStepRuleId();
+        this.stopsLevel = record.getStopsLevel();
+        this.swapLong = record.getSwapLong();
+        this.swapRollover = record.getSwapRollover();
+        this.swapShort = record.getSwapShort();
+        this.swapType = record.getSwapType();
+        this.symbol = record.getSymbol();
+        this.tickSize = record.getTickSize();
+        this.tickValue = record.getTickValue();
+        this.time =  record.getTime().getTime();
+        this.timeString = record.getTime().toLocalDateTime().toString();
+        this.type = record.getType();
+    }
+    
+    
     public SymbolData(double ask, double bid, String currency, String currencyProfit, String description, 
             int instantMaxVolume, double high, double low, String symbol, long time, int type, 
             String groupName, String categoryName, boolean longOnly, Long starting, Long expiration, 

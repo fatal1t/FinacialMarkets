@@ -91,7 +91,7 @@ public class SyncListener {
         
         JmsTemplate jmsTemplate = this.context.getBean(JmsTemplate.class);
         log.info("Target queue: " + queue.toString());
-        log.info("Sending back: " +CorelId+ " "+ message.substring(0, 20));
+        log.info("Sending back: " +CorelId+ " "+ message.substring(0, 10));
         jmsTemplate.send(queue, messageCreator);
     } 
     

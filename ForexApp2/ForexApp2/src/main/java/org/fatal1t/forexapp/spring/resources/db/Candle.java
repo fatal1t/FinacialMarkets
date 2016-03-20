@@ -7,6 +7,7 @@ package org.fatal1t.forexapp.spring.resources.db;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 
 /**
  *
@@ -43,13 +45,32 @@ public class Candle implements Serializable {
     
     @Column(name = "cclose")
     private double close;
+    
     @Column(name = "cvol")
     private double vol;
+    
     @Column(name = "cquoteid")
     private int quoteId;
+    
     @Column(name = "csymbol")
     private String symbol;
 
+    public Candle( )
+    {
+        
+    }
+    
+    public Candle(CandleDataRecord record)
+    {
+        this.close = record.getClose();
+        this.high = record.getHigh();
+        this.low = record.getLow();
+        this.open = record.getOpen();
+        this.quoteId = record.getQuoteId();
+        this.symbol = record.getSymbol();
+        this.time = Timestamp.from(Instant.ofEpochMilli(record.getCtm()));
+    }
+    
     public long getId() {
         return id;
     }

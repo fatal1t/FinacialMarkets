@@ -14,12 +14,15 @@ import java.io.IOException;
 import java.sql.Time;
 
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.fatal1t.forexapp.spring.api.adapters.requests.GetSymbolReq;
 
 import org.fatal1t.forexapp.spring.session.HourData;
 import org.fatal1t.forexapp.spring.session.SymbolTradingHours;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetTradingHoursReq;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetSymbolResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradingHoursResp;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.stereotype.Component;
@@ -33,6 +36,7 @@ import pro.xstore.api.message.response.AllSymbolsResponse;
 import pro.xstore.api.message.response.CurrentUserDataResponse;
 import pro.xstore.api.message.response.LoginResponse;
 import pro.xstore.api.message.response.LogoutResponse;
+import pro.xstore.api.message.response.SymbolResponse;
 import pro.xstore.api.message.response.TradingHoursResponse;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.ServerData;
@@ -194,9 +198,20 @@ public final class APISyncAdapter  {
     {
         
     }
-    public void GetSymbol()
+    public GetSymbolResp GetSymbol(GetSymbolReq request)
     {
-        
+        try {
+            SymbolResponse resp = APICommandFactory.executeSymbolCommand(connector, request.getSymbol());
+            log.info("Prijata data: " + resp.toString().substring(0,100));
+            GetSymbolResp response = new GetSymbolResp();
+            response.setSymbolData(resp.getSymbol());
+            return response;
+            
+        } catch (APICommandConstructionException | APIReplyParseException | APIErrorResponse | APICommunicationException ex) {
+            log.fatal("error");
+            log.fatal(ex);
+            return null;
+        }        
     }
     public void GetTradeRecords()
     {
@@ -211,7 +226,7 @@ public final class APISyncAdapter  {
         {
             TradingHoursResponse response = APICommandFactory.executeTradingHoursCommand(connector, symbols);
             data = new GetTradingHoursResp();
-            log.info("Prijata data: "+ data.toString());
+            log.info("Prijata data: "+ response.toString().substring(0, 10));
             for(String symbol : response.getSymbols())
             {
                 SymbolTradingHours hours = new SymbolTradingHours(symbol);

@@ -33,8 +33,7 @@ public class DistributeTicksAsync extends AsyncService{
     private final Logger log = Logger.getLogger(DistributeTicksAsync.class.getName());
     @PostConstruct
     private void initService()
-    {
-        
+    {        
         this.queueConfigData.findByService("DistributeTicksAsync").forEach((QueueConfig q) -> {
             this.observers.add(new AsyncServiceObserver(q.getTargertqueue()));
         });
@@ -43,8 +42,8 @@ public class DistributeTicksAsync extends AsyncService{
     @Override
     @JmsListener(destination = "forex.async.ticks", containerFactory = "myJmsContainerFactory")
     public void listen(TextMessage message) throws JMSException{
-        log.info("Prijata zprava: "+ message.getText());
-        log(message, "DistributeTicksAsync");
+        log.info("Prijata zprava: "+ message.getText().substring(0, 100));
+        //log(message, "DistributeTicksAsync");
         MessageCreator msgCreator = (Session session) -> {
             TextMessage msg = session.createTextMessage();
             msg.setText(message.getText());

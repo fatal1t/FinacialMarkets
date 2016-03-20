@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.annotation.PostConstruct;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.fatal1t.forexapp.spring.api.eventdata.BalanceRecord;
 import org.fatal1t.forexapp.spring.session.AppSession;
 import org.fatal1t.forexapp.spring.session.SessionLocal;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.NewsRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.annotation.EnableJms;
@@ -33,6 +34,12 @@ import pro.xstore.api.streaming.StreamingListener;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.SyncAPIConnector;
 import org.fatal1t.forexapp.spring.api.eventdata.TickRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.TradeRecord;
+import org.fatal1t.forexapp.spring.resources.db.Symbol;
+import org.fatal1t.forexapp.spring.resources.db.SymbolsRepository;
+import pro.xstore.api.message.records.SBalanceRecord;
+import pro.xstore.api.message.records.SNewsRecord;
+import pro.xstore.api.message.records.STradeRecord;
 
 /**
  *
@@ -52,6 +59,8 @@ public class APIStreamingAdapter extends Thread {
     private SyncAPIConnector tickConnector;
     private SyncAPIConnector candlesConnector;
     private SyncAPIConnector newsConnector;
+    private SyncAPIConnector balanceConnector;
+    private SyncAPIConnector tradesConnector;
 
     @PostConstruct
     private void init()
@@ -65,14 +74,14 @@ public class APIStreamingAdapter extends Thread {
     {  
         this.session = AppSession.getSession();
         initate();
-        try {
-            
+        try {            
+            /// Tick data listenener 
             List<String> testSymbols = new ArrayList<>();
             List<String> symbols;
             testSymbols.add("EURUSD");
             testSymbols.add("EURGBP");
             testSymbols.add("EURCZK");
-            symbols = testSymbols;
+            symbols = loadSymbols();
             final StreamingListener tickListener = new StreamingListener() {
                 @Override
                 public void receiveTickRecord(STickRecord tickRecord) {
@@ -81,12 +90,15 @@ public class APIStreamingAdapter extends Thread {
                         tickRecord.getHigh(), tickRecord.getLow(), tickRecord.getSpreadRaw(),
                         tickRecord.getSpreadTable(), tickRecord.getSymbol(),
                         tickRecord.getQuoteId(), tickRecord.getLevel(), tickRecord.getTimestamp());
-                 //log.info("Async: prijata zprava: " + record.getSymbol() );
-                 //connector.sendMessage(record);
+                 log.info("Async: prijata Tick zprava: " + record.getSymbol() );
+                 connector.sendMessage(record);
                 }
             };                       
             this.tickConnector.connectStream(tickListener);
             this.tickConnector.subscribePrices(symbols);
+            
+            ///Candles Listener
+            
             final StreamingListener candlesListener = new StreamingListener()
             {
               @Override
@@ -95,16 +107,58 @@ public class APIStreamingAdapter extends Thread {
                   CandleDataRecord record = new CandleDataRecord(candleRecord.getCtm(), candleRecord.getCtmString(), 
                           candleRecord.getOpen(), candleRecord.getHigh(), candleRecord.getLow(), candleRecord.getClose(), 
                           candleRecord.getVol(), candleRecord.getQuoteId(), candleRecord.getSymbol());
-                  log.info("Async: prijata zprava: " + record.getSymbol() );
+                  log.info("Async: prijata Candles zprava: " + record.getSymbol() );
                   connector.sendMessage(record);
-                  //GeneralLog.getLog().WriteToLog("Stream candle record: " + candleRecord.getSymbol());
-                  //System.out.println("Stream candle record: " + candleRecord.getSymbol());
-                  //      manager.getQueue("CandleDataQueue").insertToQueue();
-                  
               }
             };
             this.candlesConnector.connectStream(candlesListener);
             this.candlesConnector.subscribeCandles(symbols);
+            
+            
+            /// Balances listener
+            final StreamingListener balanceListener = new StreamingListener()
+            {
+                @Override
+                public void receiveBalanceRecord(SBalanceRecord record)
+                {
+                    BalanceRecord newRecord = new BalanceRecord(record);
+                    connector.sendMessage(newRecord);
+                }
+            };
+            this.balanceConnector.connectStream(balanceListener);
+            this.balanceConnector.subscribeBalance();
+            
+            /// Balances listener
+            final StreamingListener newsListener = new StreamingListener()
+            {
+                @Override
+                public void receiveNewsRecord(SNewsRecord record)
+                {                   
+                    NewsRecord newRecord = new NewsRecord(record);
+                    connector.sendMessage(newRecord);
+                }
+            };
+            this.newsConnector.connectStream(newsListener);
+            this.newsConnector.subscribeNews();
+            
+            final StreamingListener tradeListener = new StreamingListener()
+            {
+                @Override
+                public void receiveTradeRecord(STradeRecord record)
+                {
+                    TradeRecord newRecord = new TradeRecord(record);
+                    connector.sendMessage(newRecord);
+                }
+                
+            };
+            this.tradesConnector.connectStream(tradeListener);
+            this.tradesConnector.subscribeTrades();
+            
+            final StreamingListener profitListener = new StreamingListener()
+            {
+             
+            };
+            
             
             Timer t = new Timer();
             t.schedule(new TimerTask() {
@@ -114,17 +168,34 @@ public class APIStreamingAdapter extends Thread {
                         tickConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
                         //GeneralLog.getLog().WriteToLog("TickConnector refreshed");
                         candlesConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
-                        //GeneralLog.getLog().WriteToLog("CnadlesConnector refresed");
+                        
+                        balanceConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
+                        newsConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
+                        tradesConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
 
                     } catch (APICommandConstructionException | APICommunicationException ex) {
                         try {
+                            log.error("Problem s konektort, restartuju");
+                            tickConnector.close();                            
                             tickConnector = initConnector();
+                            candlesConnector.close();
                             candlesConnector = initConnector();
+                            balanceConnector.close();
+                            balanceConnector = initConnector();
+                            tradesConnector.close();
+                            tradesConnector = initConnector();
+                            newsConnector.close();
+                            newsConnector = initConnector();
                             tickConnector.connectStream(tickListener);
-                            tickConnector.subscribePrices(symbols);
-                            
+                            tickConnector.subscribePrices(symbols);                            
                             candlesConnector.connectStream(candlesListener);
                             candlesConnector.subscribeCandles(symbols);
+                            balanceConnector.connectStream(balanceListener);
+                            balanceConnector.subscribeBalance();
+                            tradesConnector.connectStream(tradeListener);
+                            tradesConnector.subscribeTrades();
+                            newsConnector.connectStream(newsListener);
+                            newsConnector.subscribeNews();
                         } catch (IOException | APICommunicationException ex1) {
                            log.fatal(ex1.getStackTrace());
                            
@@ -146,6 +217,8 @@ public class APIStreamingAdapter extends Thread {
         this.tickConnector = initConnector();
         this.candlesConnector = initConnector();
         this.newsConnector = initConnector();
+        this.balanceConnector = initConnector();
+        this.tradesConnector = initConnector();
     }
     
     private SyncAPIConnector initConnector()
@@ -176,5 +249,18 @@ public class APIStreamingAdapter extends Thread {
             return null;
         }
     }
-
+    
+    private List<String> loadSymbols()
+    {
+        SymbolsRepository repository = this.context.getBean(SymbolsRepository.class);
+        List<String> newList = new ArrayList<>();
+        repository.findByTicks(true).forEach((Symbol symbol ) -> {
+            newList.add(symbol.getSymbol());
+        });
+        newList.forEach((String s ) -> {
+            System.out.print(s+" ");
+        }
+        );
+        return newList;
+    }
 }

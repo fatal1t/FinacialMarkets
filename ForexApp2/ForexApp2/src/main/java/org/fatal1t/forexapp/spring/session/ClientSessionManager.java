@@ -17,6 +17,8 @@ import org.fatal1t.forexapp.spring.api.adapters.requests.GetUserDataReq;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetAllSymbolsResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradingHoursResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
+import org.fatal1t.forexapp.spring.resources.db.Symbol;
+import org.fatal1t.forexapp.spring.resources.db.SymbolsRepository;
 import org.fatal1t.forexapp.spring.services.common.EndpointConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -29,8 +31,6 @@ import org.springframework.stereotype.Service;
 @Service("ClientSessionManager")
 public class ClientSessionManager extends EndpointConnector{
     
-    
-    private ConfigurableApplicationContext context;
     private final Logger log = LogManager.getLogger(ClientSessionManager.class.getName());
     private final String connectingSymbolsQueue = "forex.sync.getallsymbols.request";
     private final String symbolsMessageType = "GetAllSymbols";
@@ -40,6 +40,7 @@ public class ClientSessionManager extends EndpointConnector{
     private final String connectingTradingHoursQueue = "forex.sync.gettradinghours.request";
     private final String tradingHoursMessageType = "GetTradingHours";
     private final XStream xs = new XStream();
+    private final AppSession appSession = AppSession.getSession();
     private GetAllSymbolsResp symbolsResponse;
     @Autowired
     public ClientSessionManager(ConfigurableApplicationContext context) {
@@ -58,7 +59,8 @@ public class ClientSessionManager extends EndpointConnector{
         } catch (JMSException ex) {
             log.fatal("neco sa posralo na ceste do sluzby");
         }
-        
+        this.appSession.setSymbols(response.getSymbols());
+        updateSymbols(response.getSymbols());
         
     }
     private void getUserData()
@@ -102,6 +104,21 @@ public class ClientSessionManager extends EndpointConnector{
         getSymbols();
         getTradingHours();
     }
-    
-    
+    private void updateSymbols(List<SymbolData> symbolData)
+    {
+        SymbolsRepository repository = this.context.getBean(SymbolsRepository.class);
+        symbolData.forEach((SymbolData record )-> {
+            Symbol symbol = new Symbol(record);
+            List<Symbol> oldSymbols = repository.findBySymbol(symbol.getSymbol());
+            if(oldSymbols.size() > 1)
+            {
+                repository.delete(oldSymbols);
+            }
+            if(oldSymbols.size() == 1)
+            {
+                symbol.setId(oldSymbols.get(0).getId());
+            }
+            repository.save(symbol);
+        });
+    }
 }

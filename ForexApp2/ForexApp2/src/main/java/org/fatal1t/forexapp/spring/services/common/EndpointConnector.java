@@ -31,8 +31,9 @@ import org.springframework.jms.support.destination.DestinationResolver;
  * @author Filip
  */
 public class EndpointConnector {
+    
     @Autowired
-    private final ConfigurableApplicationContext context;
+    protected final ConfigurableApplicationContext context;
     private static final Logger log = LogManager.getLogger(EndpointConnector.class.getName());
     private static final class ProducerConsumer implements SessionCallback<Message> {
  

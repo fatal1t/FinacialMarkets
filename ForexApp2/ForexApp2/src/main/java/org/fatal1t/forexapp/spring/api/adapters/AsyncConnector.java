@@ -6,10 +6,13 @@
 package org.fatal1t.forexapp.spring.api.adapters;
 
 import com.thoughtworks.xstream.XStream;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.fatal1t.forexapp.spring.api.eventdata.BalanceRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.NewsRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.TickRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.TradeRecord;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -18,7 +21,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
 
-import pro.xstore.api.message.records.TradeRecord;
+
 
 /**
  *
@@ -28,6 +31,7 @@ import pro.xstore.api.message.records.TradeRecord;
 public class AsyncConnector {
     @Autowired
     private ConfigurableApplicationContext context;
+    private final Logger log = LogManager.getLogger(this.getClass().getName());
     private final String TickQueueName = "forex.async.ticks";
     private final String CandlesQueueName = "forex.async.candles";
     private final String BalanceQueueName = "forex.async.balance";
@@ -37,7 +41,7 @@ public class AsyncConnector {
     private void sendMessage(String message, String queue) throws JmsException, BeansException {
         MessageCreator messageCreator = (javax.jms.Session session1) -> session1.createTextMessage(message);
         JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
-        System.out.println("Sending a new message: queue: " + queue + "message:" + message);
+        log.info("Sending a new message: queue: " + queue + "message:" + message.substring(0, 50));
         jmsTemplate.send(queue, messageCreator);
     }
     
