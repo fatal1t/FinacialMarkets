@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.core.storages;
+package org.fatal1t.forexapp.spring.calculations.engine;
 
 import com.thoughtworks.xstream.XStream;
 import java.sql.Timestamp;
@@ -11,8 +11,8 @@ import java.time.Instant;
 import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.fatal1t.forexapp.spring.resources.db.Candle;
 import org.fatal1t.forexapp.spring.resources.db.CandlesRepository;
@@ -52,10 +52,13 @@ public class CandlePermanentStorage {
         candle.setSymbol(candleDataRecord.getSymbol());
         candle.setVol(candleDataRecord.getVol());
         candle.setTime(Timestamp.from(Instant.ofEpochMilli(candleDataRecord.getCtm())));
+        candle.setPeriod(1);
         log.info("Saved new record: " + candle.toString());
         this.candleStorage.save(candle);
         
     }
+    
+    
     
     
     

@@ -9,7 +9,8 @@ import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.fatal1t.forexapp.spring.config.QueueConfig;
 import org.fatal1t.forexapp.spring.services.common.AsyncService;
 import org.fatal1t.forexapp.spring.services.common.AsyncServiceObserver;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service("DistributeCandlesAsync" )
 public class DistributeCandlesAsync extends AsyncService {
 
-    private final Logger log = Logger.getLogger(DistributeCandlesAsync.class.getName());
+    private final Logger log = LogManager.getLogger(DistributeCandlesAsync.class.getName());
     @PostConstruct
     private void initService()
     {        

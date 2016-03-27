@@ -16,5 +16,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface SymbolsRepository  extends  CrudRepository<Symbol, Long>{
     public List<Symbol> findBySymbol(String symbol);
     public List<Symbol> findByTicks(boolean ticks);
+    
    
 }

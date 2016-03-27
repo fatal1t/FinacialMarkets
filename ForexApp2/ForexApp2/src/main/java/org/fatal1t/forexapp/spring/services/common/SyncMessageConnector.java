@@ -7,7 +7,8 @@ package org.fatal1t.forexapp.spring.services.common;
 
 import java.util.UUID;
 import javax.annotation.PostConstruct;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -18,7 +19,6 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
-import org.apache.log4j.LogManager;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;

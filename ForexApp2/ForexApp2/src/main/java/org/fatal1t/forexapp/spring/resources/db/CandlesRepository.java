@@ -5,6 +5,7 @@
  */
 package org.fatal1t.forexapp.spring.resources.db;
 
+import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 /**
@@ -12,6 +13,6 @@ import org.springframework.data.repository.CrudRepository;
  * @author Filip
  */
 public interface CandlesRepository extends CrudRepository<Candle, Long>{
-    
+    public List<Candle> findBySymbolInOrderByTime(List<String> symbols);
     
 }

@@ -41,18 +41,29 @@ CREATE SEQUENCE forexdata.candelstempids   INCREMENT 1
   START 10
   CACHE 1;
 
-CREATE TABLE forexdata.candlestemp(
-	id bigint DEFAULT nextval('forexdata.candelstempids') PRIMARY KEY,
-	time timestamp,
-	open double precision,
-	high double precision,
-	low double precision,
-	close double precision,
-	vol double precision,
-	quoteId int,
-	symbol varchar(10)
-    );
-GRANT INSERT ON  forexdata.candlestemp TO app;
+
+CREATE TABLE forexdata.candlestemp
+(
+  id bigint NOT NULL DEFAULT nextval('forexdata.candelstempids'::regclass),
+  itime timestamp without time zone,
+  copen double precision,
+  chigh double precision,
+  clow double precision,
+  cclose double precision,
+  cvol double precision,
+  cquoteid integer,
+  csymbol character varying(10),
+  period integer,
+  CONSTRAINT candlestemp_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE forexdata.candlestemp
+  OWNER TO admin;
+GRANT ALL ON TABLE forexdata.candlestemp TO admin;
+GRANT INSERT ON TABLE forexdata.candlestemp TO app;
+
  
 CREATE SEQUENCE forexdata.symbolsids 
   INCREMENT 1

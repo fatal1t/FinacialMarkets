@@ -10,7 +10,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.fatal1t.forexapp.spring.config.QueueConfig;
 import org.fatal1t.forexapp.spring.services.common.AsyncService;
 import org.fatal1t.forexapp.spring.services.common.AsyncServiceObserver;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Service;
 public class DistributeTicksAsync extends AsyncService{
       
    
-    private final Logger log = Logger.getLogger(DistributeTicksAsync.class.getName());
+    private final Logger log = LogManager.getLogger(DistributeTicksAsync.class.getName());
     @PostConstruct
     private void initService()
     {        
@@ -42,7 +43,7 @@ public class DistributeTicksAsync extends AsyncService{
     @Override
     @JmsListener(destination = "forex.async.ticks", containerFactory = "myJmsContainerFactory")
     public void listen(TextMessage message) throws JMSException{
-        log.info("Prijata zprava: "+ message.getText().substring(0, 100));
+        //log.info("Prijata zprava: "+ message.getText().substring(0, 100));
         //log(message, "DistributeTicksAsync");
         MessageCreator msgCreator = (Session session) -> {
             TextMessage msg = session.createTextMessage();

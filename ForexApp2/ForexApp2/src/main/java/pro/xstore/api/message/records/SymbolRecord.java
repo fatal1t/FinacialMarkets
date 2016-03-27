@@ -105,7 +105,21 @@ public class SymbolRecord implements BaseResponseRecord {
 	        this.setTickSize((Double) e.get("tickSize"));
 	        this.setTickValue((Double) e.get("tickValue"));
 	        this.currencyPair = (Boolean) e.get("currencyPair");
-	        this.leverage = (Double) e.get("leverage");
+                try{
+                    this.leverage = (double) e.get("leverage");
+                }
+                catch(ClassCastException ex)
+                {
+                    try
+                    {
+                        this.leverage = (Long) e.get("leverage");
+                    }
+                    catch(ClassCastException ex1)
+                    {
+                        System.out.println("error v castu");
+                    }
+                }
+	        
 	        this.spreadRaw = (Double) e.get("spreadRaw");
 	        this.spreadTable = (Double) e.get("spreadTable");
     	}

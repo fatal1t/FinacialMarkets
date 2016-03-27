@@ -5,14 +5,13 @@
  */
 package org.fatal1t.forexapp.spring.services.common;
 
-import java.util.logging.Level;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.jms.annotation.JmsListener;
 
 /**

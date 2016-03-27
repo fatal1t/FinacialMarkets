@@ -9,8 +9,8 @@ import com.thoughtworks.xstream.XStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jms.JMSException;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetAllSymbolsReq;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetTradingHoursReq;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetUserDataReq;
@@ -42,6 +42,7 @@ public class ClientSessionManager extends EndpointConnector{
     private final XStream xs = new XStream();
     private final AppSession appSession = AppSession.getSession();
     private GetAllSymbolsResp symbolsResponse;
+    
     @Autowired
     public ClientSessionManager(ConfigurableApplicationContext context) {
         super(context);
@@ -121,4 +122,9 @@ public class ClientSessionManager extends EndpointConnector{
             repository.save(symbol);
         });
     }
+
+
+
+
+    
 }

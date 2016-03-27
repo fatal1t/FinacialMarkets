@@ -7,8 +7,8 @@ package org.fatal1t.forexapp.spring.testing;
 
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.annotation.JmsListener;
@@ -27,9 +27,9 @@ public class TestListener {
     
     @JmsListener(destination = "forex.async.tick.candlestorage",  containerFactory = "myJmsContainerFactory")
     public void receiveMessage(TextMessage message) throws JMSException {
-        log.info("Source Queue: "+message.getJMSDestination().toString());
+        //log.info("Source Queue: "+message.getJMSDestination().toString());
         
-        log.info("Received:"+ message.getJMSCorrelationID()+ " <" + message.getText().substring(0,100) + ">");
+        //log.info("Received:"+ message.getJMSCorrelationID()+ " <" + message.getText().substring(0,100) + ">");
        /*
         switch(message.getJMSType())
         {

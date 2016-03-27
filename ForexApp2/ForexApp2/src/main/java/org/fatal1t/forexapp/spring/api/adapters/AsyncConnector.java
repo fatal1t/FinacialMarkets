@@ -6,8 +6,8 @@
 package org.fatal1t.forexapp.spring.api.adapters;
 
 import com.thoughtworks.xstream.XStream;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.fatal1t.forexapp.spring.api.eventdata.BalanceRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.NewsRecord;
