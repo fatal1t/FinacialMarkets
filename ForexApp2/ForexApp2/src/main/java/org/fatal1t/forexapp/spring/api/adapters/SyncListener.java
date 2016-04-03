@@ -6,16 +6,19 @@
 package org.fatal1t.forexapp.spring.api.adapters;
 
 import com.thoughtworks.xstream.XStream;
+import java.util.ArrayList;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.fatal1t.forexapp.spring.api.adapters.requests.GetCandlesRangeReq;
+import org.fatal1t.forexapp.spring.api.adapters.requests.CandlesRange;
+import org.fatal1t.forexapp.spring.api.adapters.requests.GetCandlesHistoryReq;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetTradingHoursReq;
 import org.fatal1t.forexapp.spring.session.AppSession;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetAllSymbolsResp;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetCandlesHistoryResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetCandlesRangeResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradingHoursResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
@@ -55,7 +58,8 @@ public class SyncListener {
             sendMessage( "Error in adapter setting, cant login", message.getJMSCorrelationID(), message.getJMSReplyTo());
         }        
         XStream xs = new XStream();    
-        Object o = xs.fromXML(message.getText());       
+        Object o = xs.fromXML(message.getText()); 
+        System.out.println(message.getText());
         switch(message.getJMSType())
         {
             case "GetUserData" : {
@@ -74,10 +78,15 @@ public class SyncListener {
                 sendMessage(xs.toXML(APIResp), message.getJMSCorrelationID(), message.getJMSReplyTo());
                 break;
             }
-            case "GetCandlesRange":
+            case "GetCandlesHistory":
             {
-                GetCandlesRangeResp APIResp = this.APIAdapter.getCandlesRange((GetCandlesRangeReq) o);
-                sendMessage(xs.toXML(APIResp), message.getJMSCorrelationID(), message.getJMSReplyTo());
+                GetCandlesHistoryReq request = (GetCandlesHistoryReq) o;
+                GetCandlesHistoryResp response = new GetCandlesHistoryResp();
+                request.getRequestList().forEach((CandlesRange range) -> {                    
+                    GetCandlesRangeResp APIResp = this.APIAdapter.getCandlesRange(request.getSymbol(), range);
+                    response.getRecords().put(range.getId(),  APIResp.getRecords());
+                });
+                sendMessage(xs.toXML(response), message.getJMSCorrelationID(), message.getJMSReplyTo());
                 break;
             }
         }

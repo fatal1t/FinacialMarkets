@@ -44,7 +44,7 @@ import org.springframework.util.FileSystemUtils;
     
     @EnableJpaRepositories
     @SpringBootApplication
-    public class Application {
+public class Application {
         @Bean
         JmsListenerContainerFactory<?> myJmsContainerFactory(ConnectionFactory connectionFactory) {
         SimpleJmsListenerContainerFactory factory = new SimpleJmsListenerContainerFactory();
@@ -66,34 +66,14 @@ import org.springframework.util.FileSystemUtils;
         // Launch the application
         ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
         log.info("Session is loaded");
-        /*        CandlesRepository repository = context.getBean(CandlesRepository.class);
-        List<String> symbols = new ArrayList<>();
-        symbols.add("EURSUD");
-        symbols.add("USDCZK");
-        symbols.add("EURCHF");
-        List<Candle> list = repository.findBySymbolInOrderByTime(symbols);
-        System.out.println(list.get(0).toString());
-        System.out.println(list.size());*/
         System.out.println("Tady se neco deje");
         CandlesTempStorage storage = context.getBean(CandlesTempStorage.class);
-
+        storage.getCandlesFromPermanentStorage();
+        ClientSessionManager manager = context.getBean(ClientSessionManager.class);
+        manager.init(); 
+        APIStreamingAdapter adapter = context.getBean(APIStreamingAdapter.class);
+        adapter.start();
         
-
-        //respond(xs.toXML(request), UUID.randomUUID().toString(), "forex.sync.getuserdata.request", "forex.sync.getuserdata.response", jmsTemplate );
-        
-        //SyncMessageConnector sync = SyncMessageConnector.getConnector(context);
-        //sync.request(xs.toXML(request), "forex.sync.listener.connector");
- 
-        // Send a message
-        //APIStreamingAdapter adapter = context.getBean(APIStreamingAdapter.class);
-        //adapter.start();
-        //ClientSessionManager manager = context.getBean(ClientSessionManager.class);
-        //manager.init();
-        
-        
-        //APIStreamingAdapter ad = context.getBean(APIStreamingAdapter.class);
-        //ad.start();
-        // TODO code application logic here
     }
-    }
+}
 

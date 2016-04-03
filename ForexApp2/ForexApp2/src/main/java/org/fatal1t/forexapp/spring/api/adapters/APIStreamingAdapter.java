@@ -232,7 +232,7 @@ public class APIStreamingAdapter extends Thread {
                 if(response.getStatus())
                 {
                     IsLoggedIn = true;
-                    System.out.println("prihlaseno na streaming");
+                    
                 }
                 return connector;
             }

@@ -12,15 +12,28 @@ import java.util.List;
  * @author Filip
  */
 public class GetCandlesHistoryReq {
-    private List<GetCandlesRangeReq> requestList;
+    private String symbol;
+    private List<CandlesRange> requestList;
 
-    public List<GetCandlesRangeReq> getRequestList() {
+    public GetCandlesHistoryReq(String symbol, List<CandlesRange> requestList) {
+        this.symbol = symbol;
+        this.requestList = requestList;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+    
+    public List<CandlesRange> getRequestList() {
         return requestList;
     }
 
-    public void setRequestList(List<GetCandlesRangeReq> requestList) {
+    public void setRequestList(List<CandlesRange> requestList) {
         this.requestList = requestList;
     }
-    
     
 }

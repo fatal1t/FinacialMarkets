@@ -6,14 +6,15 @@
 package org.fatal1t.forexapp.spring.session;
 
 import java.util.List;
-
+import org.springframework.stereotype.Component;
+ 
 
 /**
  *
  * @author Filip
  */
 
-
+@Component
 public class AppSession implements SessionLocal {
     private boolean isLoaded;
     private UserData userData;

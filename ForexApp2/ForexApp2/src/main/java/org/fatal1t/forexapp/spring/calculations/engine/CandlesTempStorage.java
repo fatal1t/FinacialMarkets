@@ -8,18 +8,23 @@ package org.fatal1t.forexapp.spring.calculations.engine;
 import com.oracle.jrockit.jfr.ContentType;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.fatal1t.forexapp.spring.api.adapters.requests.CandlesRange;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
+import org.fatal1t.forexapp.spring.calculations.messaging.CalculationConnector;
 import org.fatal1t.forexapp.spring.resources.db.Candle;
 import org.fatal1t.forexapp.spring.resources.db.CandlesRepository;
 import org.fatal1t.forexapp.spring.resources.db.Symbol;
 import org.fatal1t.forexapp.spring.resources.db.SymbolsRepository;
+import org.fatal1t.forexapp.spring.services.common.EndpointConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,6 +37,7 @@ public class CandlesTempStorage {
     private final ConfigurableApplicationContext context;
     private CandlesRepository candlesRepository;
     private SymbolsRepository symbolsRepository;
+    private CalculationConnector connector;
     private final Logger log =  LogManager.getLogger(this.getClass().getName());
     private final int[] intervals = {1, 5, 15, 30, 60, 240, 1440};
     private final HashMap<String, List<Candle>> recordListM1;
@@ -46,9 +52,10 @@ public class CandlesTempStorage {
     private int counter60 = 0;
     
     @Autowired
-    public CandlesTempStorage(ConfigurableApplicationContext context, SymbolsRepository repository)
+    public CandlesTempStorage(ConfigurableApplicationContext context, SymbolsRepository repository, CalculationConnector connector)
     {
         this.context = context;
+        this.connector = connector;
         this.symbolsRepository = repository;
         this.recordListM1 = new HashMap<>();
         this.recordListM15 = new HashMap<>();
@@ -61,8 +68,8 @@ public class CandlesTempStorage {
             symbols.add(s.getSymbol());
         });
     }
-    @PostConstruct
-    private void getCandlesFromPermanentStorage()
+    //@PostConstruct
+    public void getCandlesFromPermanentStorage()
     {        
         log.info("Initializing session for Candles Storage");
         HashMap<String, List<Candle>> m1 = new HashMap<>();
@@ -109,23 +116,40 @@ public class CandlesTempStorage {
                 }
             }
         });
-        m1.get("EURUSD").forEach((Candle c ) -> {
-            System.out.println(c.toString());
+        m1.forEach((String symbol, List<Candle> candles) -> { 
+            System.out.println("Kontrola konzistence pro " + symbol);
+            if(candles.size() > 0)
+            {
+                candles = checkAndFixConsistency(candles, symbol);
+            }
         });
-        checkAndFixConsistency(m1.get("EURUSD"));
+
     }
 
-    private void checkAndFixConsistency(List<Candle> candles)
+    private List<Candle> checkAndFixConsistency(List<Candle> candles, String symbol)
     {
         
         int size = candles.size();
+        long week = 604800000L;
         ArrayList<Long> startTimes = new ArrayList<>();
         ArrayList<Long> endTimes = new ArrayList<>();
-        
+        long difSum =0;
+        long difCount =0;
         for(int i = 0; i< size-1; i++)
         {
             Candle oldC = candles.get(i);
             Candle newC = candles.get(i+1);
+            //vymazani zaznamu maldsich nez 1 W a nahrati cerstvych
+            if(oldC.getTime().getTime() > System.currentTimeMillis() - week)
+            {
+                List<Candle> candlesToDelete = candles.subList(i, size -1);
+                candlesToDelete.forEach((Candle c) -> {
+                    this.candlesRepository.delete(c.getId());
+                });
+                candles.removeAll(candlesToDelete);
+
+                break;
+            }
             //Kontrola duplicty 
             if(oldC.isEqual(newC))
             {
@@ -135,8 +159,8 @@ public class CandlesTempStorage {
                 size = candles.size();
                 continue;
             }
+            
             //Kontrola casove vzdalenosti
-            long current = Instant.now().toEpochMilli();
             long oldTime = oldC.getTime().getTime();
             long newTime = newC.getTime().getTime();
             long dif = newTime - oldTime;
@@ -144,14 +168,31 @@ public class CandlesTempStorage {
             {
                 startTimes.add(oldTime);
                 endTimes.add(newTime);
-                System.out.println("Old " + oldC.getTime().toString() + " New "+ newC.getTime().toString() +" "+  dif/60000);        
+                difSum += dif/60000;
+                difCount++;  
             }
         }
+
+        CandlesRange range = new CandlesRange(1, candles.get(0).getPeriod(), System.currentTimeMillis() - week, System.currentTimeMillis(), 0);
+        List<CandlesRange> ranges = new ArrayList<>();
+        ranges.add(range);
+        HashMap<Integer, List<CandleDataRecord>> candlesHashMap = this.connector.getCandlesRange(symbol,ranges);
         
+        List<Candle> newCandles = new ArrayList<>();
+        candlesHashMap.forEach((Integer i, List<CandleDataRecord> candlesList) -> {
+            candlesList.forEach((CandleDataRecord r) -> {
+                newCandles.add(new Candle(r));
+            });
+        });
+        writeNewCandleIntoDB(newCandles);
+        candles.addAll(newCandles);
+        candles.sort((a,b) -> a.getTime().compareTo(b.getTime()));
+        return candles;
     }
-    private void writeNewCandleIntoDB()
+    @Async
+    private void writeNewCandleIntoDB(List<Candle> candles)
     {
-        
+        this.candlesRepository.save(candles);
     }
     
     public void insertNewRecord(CandleDataRecord record)

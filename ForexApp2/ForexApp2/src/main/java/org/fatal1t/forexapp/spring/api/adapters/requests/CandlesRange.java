@@ -9,19 +9,28 @@ package org.fatal1t.forexapp.spring.api.adapters.requests;
  *
  * @author Filip
  */
-public class GetCandlesRangeReq {
-    private String symbol;
+public class CandlesRange {
+
+    private int id;
     private int period;
     private long start;
     private long end;
     private long ticks;
 
-    public String getSymbol() {
-        return symbol;
+    public CandlesRange(int i, int period, long start, long end, long ticks) {
+        this.id = i;
+        this.period = period;
+        this.start = start;
+        this.end = end;
+        this.ticks = ticks;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int i) {
+        this.id = i;
     }
 
     public int getPeriod() {

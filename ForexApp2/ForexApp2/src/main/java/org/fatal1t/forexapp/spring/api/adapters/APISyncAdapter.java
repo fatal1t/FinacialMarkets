@@ -14,9 +14,10 @@ import java.io.IOException;
 import java.sql.Time;
 
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.fatal1t.forexapp.spring.api.adapters.requests.GetCandlesRangeReq;
+import org.fatal1t.forexapp.spring.api.adapters.requests.CandlesRange;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetSymbolReq;
 
 import org.fatal1t.forexapp.spring.session.HourData;
@@ -117,7 +118,7 @@ public final class APISyncAdapter  {
         }
     }
     
-    public GetCandlesRangeResp getCandlesRange( GetCandlesRangeReq request) 
+    public GetCandlesRangeResp getCandlesRange( String symbol, CandlesRange request)
     {
         GetCandlesRangeResp newResponse = new GetCandlesRangeResp();
         try {
@@ -150,17 +151,17 @@ public final class APISyncAdapter  {
                     return null;
                 }
             }
-            ChartResponse response = APICommandFactory.executeChartRangeCommand(connector, request.getSymbol(), period, request.getStart(), request.getEnd(), request.getTicks());
+            ChartResponse response = APICommandFactory.executeChartRangeCommand(connector, symbol, period, request.getStart(), request.getEnd(), request.getTicks());
             response.getRateInfos().forEach( (RateInfoRecord r) -> {
-                CandleDataRecord record = new CandleDataRecord(r.getCtm(), String.valueOf( r.getCtm()), r.getOpen(), r.getHigh(), r.getLow(), r.getClose(), r.getVol(), 0, request.getSymbol());
+                CandleDataRecord record = new CandleDataRecord(r.getCtm(), String.valueOf( r.getCtm()), r.getOpen(), r.getHigh(), r.getLow(), r.getClose(), r.getVol(), 0, symbol);
                 newResponse.getRecords().add(record);
             });
            return newResponse;
         }
-        catch (APICommandConstructionException | APIReplyParseException | APICommunicationException | APIErrorResponse ex) {
+        catch ( APICommandConstructionException| APIReplyParseException| APICommunicationException | APIErrorResponse ex) {
             log.fatal(ex);
             return null;
-        }
+        } 
     }
     
     public LoginResp Login(LoginReq request)

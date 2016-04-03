@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.fatal1t.forexapp.spring.calculations.listener;
+package org.fatal1t.forexapp.spring.calculations.messaging;
 
 import com.thoughtworks.xstream.XStream;
 import java.util.logging.Level;
