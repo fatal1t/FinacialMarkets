@@ -22,15 +22,15 @@ public class Configuration {
     private List<String> usedSymbols;
     public Configuration()
     {
-        this.username = "599627";
-        this.password = "a4210a80";
+        this.username = "769180";
+        this.password = "5fe8a658";
         this.serverType = ServerData.ServerEnum.DEMO;
         
     }
     public Configuration(String user, String password, String Server, boolean isLogged)
     {
-        this.username = "599627";
-        this.password = "a4210a80";
+        this.username = "769180";
+        this.password = "5fe8a658";
         this.serverType = ServerData.ServerEnum.DEMO;
         
     }
