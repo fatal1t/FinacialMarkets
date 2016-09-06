@@ -203,7 +203,7 @@ public class Symbol implements Serializable {
         this.tickValue = record.getTickValue();
         this.time =  Timestamp.from(Instant.ofEpochMilli(record.getTime()));
         this.type = record.getType();
-        if(this.categoryName.equals("Forex"))
+        if(this.categoryName.equals("Forex") && "Major".equals(this.groupName))
         {
             this.ticks = true;
         }

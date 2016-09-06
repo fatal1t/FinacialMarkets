@@ -6,15 +6,20 @@
 package org.fatal1t.forexapp.spring.api.adapters;
 
 import com.thoughtworks.xstream.XStream;
+import java.util.ArrayList;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.fatal1t.forexapp.spring.api.adapters.requests.CandlesRange;
+import org.fatal1t.forexapp.spring.api.adapters.requests.GetCandlesHistoryReq;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetTradingHoursReq;
 import org.fatal1t.forexapp.spring.session.AppSession;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetAllSymbolsResp;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetCandlesHistoryResp;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetCandlesRangeResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradingHoursResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetUserDataResp;
 import org.springframework.beans.BeansException;
@@ -40,15 +45,12 @@ public class SyncListener {
     private APISyncAdapter APIAdapter; 
 
     
+    
     @JmsListener(destination = "forex.sync.listener.connector.request", containerFactory = "myJmsContainerFactory")
     public void receiveMessage(TextMessage message) throws JMSException {
         log.info("Source Queue: "+message.getJMSDestination().toString());
         log.info("Target Queue: " + message.getJMSReplyTo().toString());
         log.info("Received:"+ message.getJMSCorrelationID()+" " +message.getJMSType() +" <" + message.getText().substring(0, 50) + ">");
-        if(this.APIAdapter == null)
-        {
-             this.APIAdapter = (APISyncAdapter) context.getBean(APISyncAdapter.class);
-        }
         initiateAdapter();
         if(!initiateAdapter())
         {
@@ -56,7 +58,8 @@ public class SyncListener {
             sendMessage( "Error in adapter setting, cant login", message.getJMSCorrelationID(), message.getJMSReplyTo());
         }        
         XStream xs = new XStream();    
-        Object o = xs.fromXML(message.getText());       
+        Object o = xs.fromXML(message.getText()); 
+        System.out.println(message.getText());
         switch(message.getJMSType())
         {
             case "GetUserData" : {
@@ -72,8 +75,18 @@ public class SyncListener {
             case "GetTradingHours" :
             {
                 GetTradingHoursResp APIResp = this.APIAdapter.GetTradingHours((GetTradingHoursReq) o);
-                System.out.println(xs.toXML(APIResp));
                 sendMessage(xs.toXML(APIResp), message.getJMSCorrelationID(), message.getJMSReplyTo());
+                break;
+            }
+            case "GetCandlesHistory":
+            {
+                GetCandlesHistoryReq request = (GetCandlesHistoryReq) o;
+                GetCandlesHistoryResp response = new GetCandlesHistoryResp();
+                request.getRequestList().forEach((CandlesRange range) -> {                    
+                    GetCandlesRangeResp APIResp = this.APIAdapter.getCandlesRange(request.getSymbol(), range);
+                    response.getRecords().put(range.getId(),  APIResp.getRecords());
+                });
+                sendMessage(xs.toXML(response), message.getJMSCorrelationID(), message.getJMSReplyTo());
                 break;
             }
         }
@@ -107,6 +120,15 @@ public class SyncListener {
             return this.APIAdapter.isConnected;
         }
 
+    }
+
+    public APISyncAdapter getAPIAdapter() {
+        return APIAdapter;
+    }
+
+    @Autowired
+    public void setAPIAdapter(APISyncAdapter APIAdapter) {
+        this.APIAdapter = APIAdapter;
     }
     
 }

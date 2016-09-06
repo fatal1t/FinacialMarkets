@@ -54,6 +54,9 @@ public class Candle implements Serializable {
     
     @Column(name = "csymbol")
     private String symbol;
+    
+    @Column(name = "period" )
+    private int period;
 
     public Candle( )
     {
@@ -70,6 +73,20 @@ public class Candle implements Serializable {
         this.symbol = record.getSymbol();
         this.time = Timestamp.from(Instant.ofEpochMilli(record.getCtm()));
     }
+
+    public Candle(Timestamp time, double open, double high, double low, double close, double vol, int quoteId, String symbol, int period) {
+        this.time = time;
+        this.open = open;
+        this.high = high;
+        this.low = low;
+        this.close = close;
+        this.vol = vol;
+        this.quoteId = quoteId;
+        this.symbol = symbol;
+        this.period = period;
+    }
+    
+    
     
     public long getId() {
         return id;
@@ -142,6 +159,31 @@ public class Candle implements Serializable {
     public void setSymbol(String symbol) {
         this.symbol = symbol;
     }
+
+    public int getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(int period) {
+        this.period = period;
+    }
     
+    @Override
+    public String toString()
+    {
+        return "Candle: symbol: " + this.symbol +" time: " +this.time.toString() + "period: " + period;
+    }
     
+    public boolean isEqual(Candle candle)
+    {
+        return candle.getClose() == this.close &&
+                candle.getHigh() == this.high &&
+                candle.getLow() == this.low &&
+                candle.getOpen() == this.open &&
+                candle.getPeriod() == this.period &&
+                candle.getQuoteId() == this.quoteId &&
+                (candle.getSymbol() == null ? this.symbol == null : candle.getSymbol().equals(this.symbol)) &&
+                candle.getTime().getTime() == this.time.getTime() &&
+                candle.getVol() == this.vol;
+    }
 }

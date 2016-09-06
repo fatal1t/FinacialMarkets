@@ -20,6 +20,9 @@ public class CandleDataRecord extends BaseRecord {
     private final int quoteId;
     private final String symbol;
 
+    
+    
+
     public CandleDataRecord(long ctm, String ctmString, double open, double high, double low, double close, double vol, int quoteId, String symbol) {
         this.ctm = ctm;
         this.ctmString = ctmString;

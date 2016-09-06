@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.annotation.PostConstruct;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.fatal1t.forexapp.spring.api.eventdata.BalanceRecord;
 import org.fatal1t.forexapp.spring.session.AppSession;
 import org.fatal1t.forexapp.spring.session.SessionLocal;
@@ -232,7 +232,7 @@ public class APIStreamingAdapter extends Thread {
                 if(response.getStatus())
                 {
                     IsLoggedIn = true;
-                    System.out.println("prihlaseno na streaming");
+                    
                 }
                 return connector;
             }

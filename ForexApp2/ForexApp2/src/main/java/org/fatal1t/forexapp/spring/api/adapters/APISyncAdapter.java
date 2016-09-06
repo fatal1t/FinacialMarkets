@@ -15,24 +15,30 @@ import java.sql.Time;
 
 import java.util.List;
 import java.util.logging.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.fatal1t.forexapp.spring.api.adapters.requests.CandlesRange;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetSymbolReq;
 
 import org.fatal1t.forexapp.spring.session.HourData;
 import org.fatal1t.forexapp.spring.session.SymbolTradingHours;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetTradingHoursReq;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetCandlesRangeResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetSymbolResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradingHoursResp;
+import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.stereotype.Component;
+import pro.xstore.api.message.codes.PERIOD_CODE;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.records.HoursRecord;
+import pro.xstore.api.message.records.RateInfoRecord;
 import pro.xstore.api.message.response.APIErrorResponse;
 import pro.xstore.api.message.response.AllSymbolsResponse;
+import pro.xstore.api.message.response.ChartResponse;
 import pro.xstore.api.message.response.CurrentUserDataResponse;
 import pro.xstore.api.message.response.LoginResponse;
 import pro.xstore.api.message.response.LogoutResponse;
@@ -110,6 +116,52 @@ public final class APISyncAdapter  {
         } catch (APICommunicationException ex) {
             log.fatal("error");
         }
+    }
+    
+    public GetCandlesRangeResp getCandlesRange( String symbol, CandlesRange request)
+    {
+        GetCandlesRangeResp newResponse = new GetCandlesRangeResp();
+        try {
+            
+            PERIOD_CODE period = null;
+            switch(request.getPeriod())
+            {
+                case 1:{
+                    period = PERIOD_CODE.PERIOD_M1;
+                    break;
+                }
+                case 5 : {
+                    period = PERIOD_CODE.PERIOD_M5;
+                    break;                            
+                }
+                case 15 : {
+                    period = PERIOD_CODE.PERIOD_M15;
+                    break;                            
+                }
+                case 30 : {
+                    period = PERIOD_CODE.PERIOD_M30;
+                    break;                            
+                }
+                case 60 : {
+                    period = PERIOD_CODE.PERIOD_H1;
+                    break;                            
+                }
+                default: {
+                    log.info("Error in input, invalid period");
+                    return null;
+                }
+            }
+            ChartResponse response = APICommandFactory.executeChartRangeCommand(connector, symbol, period, request.getStart(), request.getEnd(), request.getTicks());
+            response.getRateInfos().forEach( (RateInfoRecord r) -> {
+                CandleDataRecord record = new CandleDataRecord(r.getCtm(), String.valueOf( r.getCtm()), r.getOpen(), r.getHigh(), r.getLow(), r.getClose(), r.getVol(), 0, symbol);
+                newResponse.getRecords().add(record);
+            });
+           return newResponse;
+        }
+        catch ( APICommandConstructionException| APIReplyParseException| APICommunicationException | APIErrorResponse ex) {
+            log.fatal(ex);
+            return null;
+        } 
     }
     
     public LoginResp Login(LoginReq request)

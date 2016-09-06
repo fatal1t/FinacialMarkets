@@ -1,0 +1,130 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.4.5
+-- Dumped by pg_dump version 9.4.5
+-- Started on 2016-04-02 20:42:44
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- TOC entry 9 (class 2615 OID 32870)
+-- Name: configuration; Type: SCHEMA; Schema: -; Owner: administrator
+--
+
+CREATE SCHEMA configuration;
+
+
+ALTER SCHEMA configuration OWNER TO administrator;
+
+SET search_path = configuration, pg_catalog;
+
+--
+-- TOC entry 178 (class 1259 OID 32929)
+-- Name: service_queues_id; Type: SEQUENCE; Schema: configuration; Owner: admin
+--
+
+CREATE SEQUENCE service_queues_id
+    START WITH 10
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE service_queues_id OWNER TO admin;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 179 (class 1259 OID 32949)
+-- Name: service_queues; Type: TABLE; Schema: configuration; Owner: admin; Tablespace: 
+--
+
+CREATE TABLE service_queues (
+    id bigint DEFAULT nextval('service_queues_id'::regclass) NOT NULL,
+    service character varying(100),
+    consumer character varying(100),
+    targetqueue character varying(100) NOT NULL,
+    replytoqueue character varying(100)
+);
+
+
+ALTER TABLE service_queues OWNER TO admin;
+
+--
+-- TOC entry 2018 (class 0 OID 32949)
+-- Dependencies: 179
+-- Data for Name: service_queues; Type: TABLE DATA; Schema: configuration; Owner: admin
+--
+
+INSERT INTO service_queues VALUES (10, 'GetAllSymbolsService', 'ClientSessionManager', 'forex.sync.getallsymbols.request', 'forex.session.reply');
+INSERT INTO service_queues VALUES (11, 'GetUserDataService', 'ClientSessionManager', 'forex.sync.getuserdata.request', 'forex.session.reply');
+INSERT INTO service_queues VALUES (12, 'GetTradingHoursService', 'ClientSessionManager', 'forex.sync.gettradinghours.request', 'forex.session.reply');
+INSERT INTO service_queues VALUES (13, 'SyncListener', 'GetUserDataService', 'forex.sync.listener.connector.request', 'forex.sync.connector.getuserdata.response');
+INSERT INTO service_queues VALUES (15, 'DistributeTicksAsync', 'TickStorage', 'forex.async.tick.tickstorage', '');
+INSERT INTO service_queues VALUES (16, 'DistributeTicksAsync', 'TickManager', 'forex.async.tick.tickmanager', '');
+INSERT INTO service_queues VALUES (17, 'DistributeCandlesAsync', 'CandleStorage', 'forex.async.tick.candlestorage', '');
+INSERT INTO service_queues VALUES (18, 'DistributeCandlesAsync', 'CandleManager', 'forex.async.tick.candlemanager', '');
+INSERT INTO service_queues VALUES (19, 'DistributeCandlesAsync', 'CandleStorage', 'forex.async.tick.candlestorage', '');
+INSERT INTO service_queues VALUES (20, 'DistributeCandlesAsync', 'CandleManager', 'forex.async.tick.candlemanager', '');
+INSERT INTO service_queues VALUES (21, 'DistributeTicksAsync', 'CalculationListener', 'forex.calc.async.ticks', NULL);
+INSERT INTO service_queues VALUES (22, 'DistributeCandlesAsync', 'CalculationListener', 'forex.calc.async.candles', NULL);
+
+
+--
+-- TOC entry 2025 (class 0 OID 0)
+-- Dependencies: 178
+-- Name: service_queues_id; Type: SEQUENCE SET; Schema: configuration; Owner: admin
+--
+
+SELECT pg_catalog.setval('service_queues_id', 22, true);
+
+
+--
+-- TOC entry 1907 (class 2606 OID 32954)
+-- Name: service_queues_pkey; Type: CONSTRAINT; Schema: configuration; Owner: admin; Tablespace: 
+--
+
+ALTER TABLE ONLY service_queues
+    ADD CONSTRAINT service_queues_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2023 (class 0 OID 0)
+-- Dependencies: 9
+-- Name: configuration; Type: ACL; Schema: -; Owner: administrator
+--
+
+REVOKE ALL ON SCHEMA configuration FROM PUBLIC;
+REVOKE ALL ON SCHEMA configuration FROM administrator;
+GRANT ALL ON SCHEMA configuration TO administrator;
+GRANT USAGE ON SCHEMA configuration TO application;
+
+
+--
+-- TOC entry 2024 (class 0 OID 0)
+-- Dependencies: 179
+-- Name: service_queues; Type: ACL; Schema: configuration; Owner: admin
+--
+
+REVOKE ALL ON TABLE service_queues FROM PUBLIC;
+REVOKE ALL ON TABLE service_queues FROM admin;
+GRANT ALL ON TABLE service_queues TO admin;
+GRANT SELECT ON TABLE service_queues TO app;
+
+
+-- Completed on 2016-04-02 20:42:44
+
+--
+-- PostgreSQL database dump complete
+--
+
