@@ -17,14 +17,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class StatementManager {
     
-    private final EngineInterface engineInterface;
+    private final EngineInterface engineSimulationInterface;
+    private final EngineInterface engineRealtimeInterface;
     private final StatementRepository repository;
     
     @Autowired
-    public StatementManager(StatementRepository repository, EngineInterface engineInterface)
+    public StatementManager(StatementRepository repository, EsperRealtimeEngine esperRealtimeEngine, EsperSimulationEngine esperSimulationEngine)
     {
         this.repository = repository;
-        this.engineInterface = engineInterface;
+        this.engineRealtimeInterface = esperRealtimeEngine;
+        this.engineSimulationInterface = esperSimulationEngine;
+        
     }
     
     public boolean addNewStatement(String statementName, String statement, String desc, boolean useIt)
@@ -33,15 +36,21 @@ public class StatementManager {
         {
             return false;
         }
-        EplStatement newStatement = new EplStatement(statementName, statement, desc, useIt, false, false);
+        EplStatement newStatement = new EplStatement(statementName, statement, desc, useIt, false, false, false, true);
         this.repository.save(newStatement);
         if(useIt)
         {
-            engineInterface.addStatement(statementName, statement);
+            engineRealtimeInterface.addStatement(statementName, statement);
         }
         return true;
     }
     
+    public void addToSimulation(String statementName)
+    {
+        EplStatement statement = this.repository.findByStatementName(statementName);
+        this.engineSimulationInterface.addStatement(statement.getStatementName(), statement.getEplStatement());
+        statement.setIsSimulation(true);
+    }
     
     public interface EngineInterface
     {

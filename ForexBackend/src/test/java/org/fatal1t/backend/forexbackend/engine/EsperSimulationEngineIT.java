@@ -19,9 +19,9 @@ import org.junit.Ignore;
  * @author fatal1t
  */
 @Ignore
-public class EsperEngineIT {
+public class EsperSimulationEngineIT {
     
-    public EsperEngineIT() {
+    public EsperSimulationEngineIT() {
     }
     
     @BeforeClass
@@ -47,7 +47,7 @@ public class EsperEngineIT {
     public void testRecievieCandle() {
         System.out.println("recievieCandle");
         CandleDataRecord record = null;
-        EsperEngine instance = null;
+        EsperSimulationEngine instance = null;
         instance.recievieCandle(record);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -56,14 +56,6 @@ public class EsperEngineIT {
     /**
      * Test of run method, of class EsperEngine.
      */
-    @Test
-    public void testRun() {
-        System.out.println("run");
-        EsperEngine instance = null;
-        instance.run();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
 
     /**
      * Test of addStatement method, of class EsperEngine.
@@ -73,7 +65,7 @@ public class EsperEngineIT {
         System.out.println("addStatement");
         String statementName = "";
         String statename = "";
-        EsperEngine instance = null;
+        EsperSimulationEngine instance = null;
         instance.addStatement(statementName, statename);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -86,7 +78,7 @@ public class EsperEngineIT {
     public void testRemoveStatement() {
         System.out.println("removeStatement");
         String statementName = "";
-        EsperEngine instance = null;
+        EsperSimulationEngine instance = null;
         instance.removeStatement(statementName);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -99,7 +91,7 @@ public class EsperEngineIT {
     public void testStopStatement() {
         System.out.println("stopStatement");
         String statementName = "";
-        EsperEngine instance = null;
+        EsperSimulationEngine instance = null;
         instance.stopStatement(statementName);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -112,7 +104,7 @@ public class EsperEngineIT {
     public void testStartStatement() {
         System.out.println("startStatement");
         String statementName = "";
-        EsperEngine instance = null;
+        EsperSimulationEngine instance = null;
         instance.startStatement(statementName);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -126,7 +118,7 @@ public class EsperEngineIT {
         System.out.println("editStatement");
         String statementName = "";
         String newStatement = "";
-        EsperEngine instance = null;
+        EsperSimulationEngine instance = null;
         instance.editStatement(statementName, newStatement);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

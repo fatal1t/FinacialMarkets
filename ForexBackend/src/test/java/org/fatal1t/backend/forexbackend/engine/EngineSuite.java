@@ -18,7 +18,7 @@ import org.junit.runners.Suite;
  * @author fatal1t
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({org.fatal1t.backend.forexbackend.engine.configuration.ConfigurationSuite.class, org.fatal1t.backend.forexbackend.engine.EsperEngineTest.class, org.fatal1t.backend.forexbackend.engine.StatementManagerTest.class})
+@Suite.SuiteClasses({org.fatal1t.backend.forexbackend.engine.configuration.ConfigurationSuite.class, org.fatal1t.backend.forexbackend.engine.EsperSimulationEngineTest.class, org.fatal1t.backend.forexbackend.engine.StatementManagerTest.class})
 @Ignore
 
 public class EngineSuite {

@@ -22,12 +22,24 @@ public class CandleDataRecord extends BaseRecord {
     private  double vol;
     private  int quoteId;
     private  String symbol;
+    private int period;
 
     public CandleDataRecord()
     {
         
     }    
-
+    /**
+     * Defaultne se nastavuje perioda = 1, jinak je nutno vyuzit druhy konstruktor.
+     * @param ctm
+     * @param ctmString
+     * @param open
+     * @param high
+     * @param low
+     * @param close
+     * @param vol
+     * @param quoteId
+     * @param symbol 
+     */
     public CandleDataRecord(long ctm, String ctmString, double open, double high, double low, double close, double vol, int quoteId, String symbol) {
         this.ctm = ctm;
         this.ctmString = ctmString;
@@ -35,7 +47,19 @@ public class CandleDataRecord extends BaseRecord {
         this.high = high;
         this.low = low;
         this.close = close;
-        this.vol = vol;
+        this.vol = vol; 
+        this.quoteId = quoteId;
+        this.symbol = symbol;
+        this.period = 1;
+    }
+    public CandleDataRecord(long ctm, String ctmString, double open, double high, double low, double close, double vol, int quoteId, String symbol, int period) {
+        this.ctm = ctm;
+        this.ctmString = ctmString;
+        this.open = open;
+        this.high = high;
+        this.low = low;
+        this.close = close;
+        this.vol = vol; 
         this.quoteId = quoteId;
         this.symbol = symbol;
     }
@@ -75,10 +99,19 @@ public class CandleDataRecord extends BaseRecord {
     public String getSymbol() {
         return symbol;
     }
+
+    public int getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(int period) {
+        this.period = period;
+    }
+    
     
     @Override
     public String toString()
     {
-        return "Candle: symbol: "+ this.symbol + "timestamp: "+Timestamp.from(Instant.ofEpochMilli(this.ctm)).toString();
+        return "Candle: symbol: "+ this.symbol + " period: " + this.period + " timestamp: "+Timestamp.from(Instant.ofEpochMilli(this.ctm)).toString();
     }
 }

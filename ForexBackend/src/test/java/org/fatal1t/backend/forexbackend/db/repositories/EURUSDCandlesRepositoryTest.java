@@ -7,7 +7,7 @@ package org.fatal1t.backend.forexbackend.db.repositories;
 
 import java.util.List;
 import org.fatal1t.backend.forexbackend.Application;
-import org.fatal1t.backend.forexbackend.db.entities.EURUSDCandle;
+import org.fatal1t.backend.forexbackend.db.entities.EURUSDM1Candle;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -55,7 +55,7 @@ public class EURUSDCandlesRepositoryTest {
     @Test
     public void testSomeMethod() {
         Pageable page = new PageRequest(0, 100);
-        List<EURUSDCandle> candles = repository.findAllByOrderByIdDesc(page).getContent();
+        List<EURUSDM1Candle> candles = repository.findAllByOrderByIdDesc(page).getContent();
         
         assertTrue(candles.size()<= 100);
     }

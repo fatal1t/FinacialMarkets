@@ -74,7 +74,7 @@ public class EplStatementTest {
         System.out.println("getStatement");
         EplStatement instance = new EplStatement();
         String expResult = "";
-        String result = instance.getStatement();
+        String result = instance.getEplStatement();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -88,7 +88,7 @@ public class EplStatementTest {
         System.out.println("setStatement");
         String statement = "";
         EplStatement instance = new EplStatement();
-        instance.setStatement(statement);
+        instance.setEplStatement(statement);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

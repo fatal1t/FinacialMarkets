@@ -5,13 +5,11 @@
  */
 package org.fatal1t.backend.forexbackend.rest;
 
-import org.fatal1t.backend.forexbackend.rest.simulation.api.StopCandlesSimulationReqeust;
 import org.fatal1t.backend.forexbackend.rest.simulation.api.StopCandlesSimulationResponse;
-import org.fatal1t.backend.forexbackend.rest.simulation.api.StartCandlesSimulationRequest;
 import org.fatal1t.backend.forexbackend.rest.simulation.api.StartCandlesSimulationResponse;
-import org.fatal1t.backend.forexbackend.simulation.CandlesSimulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -23,19 +21,19 @@ public class SimulationRestAPI {
     
     private final SimulationInterface simulation;
     @Autowired
-    public SimulationRestAPI(CandlesSimulation simInterface)
+    public SimulationRestAPI(SimulationInterface simInterface)
     {
         this.simulation = simInterface;
     }
     
-    @RequestMapping(value = "/start")
-    private StartCandlesSimulationResponse startCandleSimulation(StartCandlesSimulationRequest request) 
+    @RequestMapping(value = "/start", method = RequestMethod.GET)
+    private StartCandlesSimulationResponse startCandleSimulation() 
     {
         simulation.start();
         return new StartCandlesSimulationResponse();
     }
-    @RequestMapping(value = "/stop")
-    private StopCandlesSimulationResponse stopCandlesSimulation(StopCandlesSimulationReqeust request)
+    @RequestMapping(value = "/stop", method = RequestMethod.GET)
+    private StopCandlesSimulationResponse stopCandlesSimulation()
     {
         simulation.stopSimulation();
         return new StopCandlesSimulationResponse();

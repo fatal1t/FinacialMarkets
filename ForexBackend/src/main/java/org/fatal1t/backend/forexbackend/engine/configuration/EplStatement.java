@@ -60,17 +60,25 @@ public class EplStatement implements Serializable {
     
     @Column(name = "is_main_rule")
     private boolean isMainRule;
+    
+    @Column(name="is_simulation")
+    private boolean isSimulation;
+    
+    @Column(name = "is_realtime")
+    private boolean isRealTime;
 
     public EplStatement() {
     }
 
-    public EplStatement(String statementName, String eplStatement, String description, boolean isUsed, boolean loadOnStartUp, boolean isMainRule) {
+    public EplStatement(String statementName, String eplStatement, String description, boolean isUsed, boolean loadOnStartUp, boolean isMainRule, boolean isSimulation, boolean isRealtime) {
         this.statementName = statementName;
         this.eplStatement = eplStatement;
         this.description = description;
         this.isUsed = isUsed;
         this.loadOnStartUp = loadOnStartUp;
         this.isMainRule = isMainRule;
+        this.isSimulation = isSimulation;
+        this.isRealTime = isRealtime;
     }
     
     
@@ -83,13 +91,7 @@ public class EplStatement implements Serializable {
         this.id = id;
     }
 
-    public String getStatement() {
-        return eplStatement;
-    }
 
-    public void setStatement(String statement) {
-        this.eplStatement = statement;
-    }
 
     public String getDescription() {
         return description;
@@ -138,6 +140,25 @@ public class EplStatement implements Serializable {
     public void setIsMainRule(boolean isMainRule) {
         this.isMainRule = isMainRule;
     }
+
+    public boolean isIsSimulation() {
+        return isSimulation;
+    }
+
+    public void setIsSimulation(boolean isSimulation) {
+        this.isSimulation = isSimulation;
+    }
+
+    public boolean isIsRealTime() {
+        return isRealTime;
+    }
+
+    public void setIsRealTime(boolean isRealTime) {
+        this.isRealTime = isRealTime;
+    }
+    
+    
+    
     
     @Override
     public String toString()

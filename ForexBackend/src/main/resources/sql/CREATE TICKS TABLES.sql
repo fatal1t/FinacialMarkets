@@ -76,3 +76,29 @@ ALTER TABLE forexdata.candles_EURUSD
   OWNER TO admin;
 GRANT ALL ON TABLE forexdata.candles_EURUSD TO admin;
 GRANT INSERT ON TABLE forexdata.candles_EURUSD TO app;
+
+CREATE SEQUENCE forexdata.candles_eur_usd_calc_ids;
+CREATE TABLE forexdata.candles_eurusd_calc
+(
+  id bigint NOT NULL DEFAULT nextval('forexdata.candles_eur_usd_calc_ids'::regclass),
+  itime timestamp without time zone,
+  open double precision,
+  high double precision,
+  low double precision,
+  cclose double precision,
+  vol double precision,
+  quoteid integer,
+  symbol character varying(10),
+  period integer,
+  CONSTRAINT candles_eurusd_calc_pkey PRIMARY KEY (id),
+  CONSTRAINT candles_eurusd_calc_symbols_ids FOREIGN KEY (symbol)
+      REFERENCES forexdata.symbols (symbol) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE forexdata.candles_eurusd
+  OWNER TO admin;
+GRANT ALL ON TABLE forexdata.candles_eurusd TO admin;
+GRANT INSERT ON TABLE forexdata.candles_eurusd TO app;

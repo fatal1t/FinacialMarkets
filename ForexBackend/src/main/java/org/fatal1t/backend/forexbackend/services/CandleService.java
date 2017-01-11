@@ -6,11 +6,16 @@
 package org.fatal1t.backend.forexbackend.services;
 
 
-import org.fatal1t.backend.forexbackend.db.entities.EURUSDCandle;
+import java.util.List;
+import org.fatal1t.backend.forexbackend.db.entities.EURUSDCalcCandle;
+import org.fatal1t.backend.forexbackend.db.entities.EURUSDM1Candle;
 import org.fatal1t.backend.forexbackend.db.repositories.EURUSDCandlesRepository;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.fatal1t.backend.forexbackend.db.repositories.EURUSDCalculatedCandlesRepository;
+import org.fatal1t.backend.forexbackend.engine.EsperSimulationEngine;
 
 /**
  *
@@ -19,16 +24,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class CandleService {
     @Autowired
-    private EURUSDCandlesRepository repository;
+    private EURUSDCandlesRepository eurUsdM1Repository;
     
-    public void saveCandle(CandleDataRecord record)
+    @Autowired
+    private EsperSimulationEngine engine;
+    
+    public void handleCandle(CandleDataRecord record)
     {
         switch(record.getSymbol())
         {
             case("EURUSD"):
             {   
-                repository.save(new EURUSDCandle(record));
+                eurUsdM1Repository.save(new EURUSDM1Candle(record));
+                break;
             }
         }
+        engine.recievieCandle(record);
+    }
+        
+    public interface EngineInterface
+    {
+        public void recievieCandle(CandleDataRecord record);
+        public void onStartUp(List<CandleDataRecord> records);
     }
 }

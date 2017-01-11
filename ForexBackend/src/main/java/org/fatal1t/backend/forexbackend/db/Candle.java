@@ -124,7 +124,7 @@ public abstract class Candle implements Serializable {
         this.symbol = r.getSymbol();
         this.time = Timestamp.from(Instant.ofEpochMilli(r.getCtm()));
         this.vol = r.getVol();
-        this.period = 1;
+        this.period = r.getPeriod();
     }
     
 }

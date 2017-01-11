@@ -26,6 +26,6 @@ public class CandlesReciever {
     public void receiveMessage(CandleDataRecord record) {
         
         System.out.println("Recieved candle wtih symbol +" + record.getSymbol() + " at time " + record.getCtm());
-        this.service.saveCandle(record);
+        this.service.handleCandle(record);
     }
 }

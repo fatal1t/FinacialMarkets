@@ -6,9 +6,8 @@
 package org.fatal1t.backend.forexbackend.simulation;
 
 import java.util.List;
-import org.fatal1t.backend.forexbackend.db.entities.EURUSDCandle;
+import org.fatal1t.backend.forexbackend.db.entities.EURUSDM1Candle;
 import org.fatal1t.backend.forexbackend.db.repositories.EURUSDCandlesRepository;
-import org.fatal1t.backend.forexbackend.rest.SimulationInterface;
 import org.fatal1t.backend.forexbackend.rest.SimulationRestAPI;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class CandlesSimulation implements SimulationRestAPI.SimulationInterface 
     */   
     private final  EURUSDCandlesRepository candlesRepository;    
     private final  SimulationEngineInterface engine;
-    private List<EURUSDCandle> candles;
+    private List<EURUSDM1Candle> candles;
     private boolean isRunning = false;
     
     @Autowired
@@ -46,8 +45,7 @@ public class CandlesSimulation implements SimulationRestAPI.SimulationInterface 
     public void start() {
         this.isRunning = true;
         runSimulation();
-    }
-    
+    }    
     
     @Async
     @Override
@@ -55,7 +53,6 @@ public class CandlesSimulation implements SimulationRestAPI.SimulationInterface 
         this.isRunning = false;
         
     }
-
     
     @Override
     public Boolean getStatus() {
@@ -64,8 +61,7 @@ public class CandlesSimulation implements SimulationRestAPI.SimulationInterface 
     
     @Async
     private void runSimulation()
-    {
-        this.engine.run();        
+    {             
         /// udelat tady moznost parametrizace
         Pageable page = new PageRequest(0, 100);
         candles = candlesRepository.findAll(page).getContent();
@@ -77,13 +73,5 @@ public class CandlesSimulation implements SimulationRestAPI.SimulationInterface 
     public interface SimulationEngineInterface
     {
         public void recievieCandle(CandleDataRecord record);
-        
-        public void run();
-        
-    }
-    private static class Executor
-    {
-        
-    }
-    
+    }    
 }

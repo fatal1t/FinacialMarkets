@@ -33,7 +33,7 @@ import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
  */
 @Entity
 @Table(name = "candles_EURUSD", schema = "forexdata")
-public class EURUSDCandle extends Candle implements Serializable{
+public class EURUSDM1Candle extends Candle implements Serializable{
     @Id
     @SequenceGenerator(name = "candles_eur_usd_ids", sequenceName = "forexdata.candles_eur_usd_ids")
     @GeneratedValue(generator = "candles_eur_usd_ids", strategy = GenerationType.SEQUENCE)
@@ -46,17 +46,18 @@ public class EURUSDCandle extends Candle implements Serializable{
         return "EURUSD tick in " + this.time.toString();
     }
 
-    public EURUSDCandle() {
+    public EURUSDM1Candle() {
+        this.period = 1;
     }
 
-    public EURUSDCandle(CandleDataRecord r) {
+    public EURUSDM1Candle(CandleDataRecord r) {
         super(r);        
     }
     
     public CandleDataRecord convertToCandleDataRecord()
     {
         long timestamp = this.time.getTime();
-        return new CandleDataRecord(timestamp, Long.toString(timestamp), this.open, this.high, this.low, this.close, this.vol, this.quoteId, this.symbol);
+        return new CandleDataRecord(timestamp, Long.toString(timestamp), this.open, this.high, this.low, this.close, this.vol, this.quoteId, this.symbol,1);
     }
 }
         

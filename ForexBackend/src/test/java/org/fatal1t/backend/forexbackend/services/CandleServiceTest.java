@@ -19,7 +19,6 @@ import org.junit.Ignore;
  * @author fatal1t
  */
 @Ignore
-
 public class CandleServiceTest {
     
     public CandleServiceTest() {
@@ -44,12 +43,13 @@ public class CandleServiceTest {
     /**
      * Test of saveCandle method, of class CandleService.
      */
+    @Ignore
     @Test
     public void testSaveCandle() {
         System.out.println("saveCandle");
         CandleDataRecord record = null;
         CandleService instance = new CandleService();
-        instance.saveCandle(record);
+        instance.handleCandle(record);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
