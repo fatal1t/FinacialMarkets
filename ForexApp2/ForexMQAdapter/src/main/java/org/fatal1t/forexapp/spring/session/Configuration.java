@@ -6,6 +6,7 @@
 package org.fatal1t.forexapp.spring.session;
 
 import java.util.List;
+import org.springframework.stereotype.Repository;
 import pro.xstore.api.sync.ServerData;
 import pro.xstore.api.sync.ServerData.ServerEnum;
 
@@ -13,6 +14,7 @@ import pro.xstore.api.sync.ServerData.ServerEnum;
  *
  * @author Filip
  */
+@Repository
 public class Configuration {
     private final String username;
     private final String password; 

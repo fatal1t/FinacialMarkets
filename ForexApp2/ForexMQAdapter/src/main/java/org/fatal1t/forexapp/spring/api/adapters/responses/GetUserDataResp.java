@@ -32,6 +32,14 @@ public class GetUserDataResp {
     public UserData getData() {
         return data;
     }
+
+    public GetUserDataResp() {
+        this.data = null;
+    }
+
+    public GetUserDataResp(UserData data) {
+        this.data = data;
+    }
     
 }
 

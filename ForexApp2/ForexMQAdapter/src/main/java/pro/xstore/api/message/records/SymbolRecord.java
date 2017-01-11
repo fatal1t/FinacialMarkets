@@ -39,8 +39,8 @@ public class SymbolRecord implements BaseResponseRecord {
     private MARGIN_MODE marginMode;
     private double percentage;
     private PROFIT_MODE profitMode;
-	private double spreadRaw;
-	private double spreadTable;
+    private double spreadRaw;
+    private double spreadTable;
     private boolean swapEnable;
     private double swapLong;
     private double swapShort;

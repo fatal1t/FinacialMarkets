@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.sql.Time;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -25,17 +27,25 @@ import org.fatal1t.forexapp.spring.session.SymbolTradingHours;
 import org.fatal1t.forexapp.spring.api.adapters.requests.GetTradingHoursReq;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetCandlesRangeResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetSymbolResp;
+import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradesResp;
 import org.fatal1t.forexapp.spring.api.adapters.responses.GetTradingHoursResp;
+import org.fatal1t.forexapp.spring.api.eventdata.APITradeRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
-import org.springframework.jms.annotation.EnableJms;
+import org.fatal1t.forexapp.spring.session.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pro.xstore.api.message.codes.PERIOD_CODE;
+import pro.xstore.api.message.codes.TRADE_OPERATION_CODE;
+import pro.xstore.api.message.codes.TRADE_TRANSACTION_TYPE;
 import pro.xstore.api.message.command.APICommandFactory;
+import pro.xstore.api.message.command.PingCommand;
 import pro.xstore.api.message.error.APICommandConstructionException;
 import pro.xstore.api.message.error.APICommunicationException;
 import pro.xstore.api.message.error.APIReplyParseException;
 import pro.xstore.api.message.records.HoursRecord;
 import pro.xstore.api.message.records.RateInfoRecord;
+import pro.xstore.api.message.records.TradeRecord;
+import pro.xstore.api.message.records.TradeTransInfoRecord;
 import pro.xstore.api.message.response.APIErrorResponse;
 import pro.xstore.api.message.response.AllSymbolsResponse;
 import pro.xstore.api.message.response.ChartResponse;
@@ -43,6 +53,8 @@ import pro.xstore.api.message.response.CurrentUserDataResponse;
 import pro.xstore.api.message.response.LoginResponse;
 import pro.xstore.api.message.response.LogoutResponse;
 import pro.xstore.api.message.response.SymbolResponse;
+import pro.xstore.api.message.response.TradeTransactionResponse;
+import pro.xstore.api.message.response.TradesResponse;
 import pro.xstore.api.message.response.TradingHoursResponse;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.ServerData;
@@ -52,7 +64,7 @@ import pro.xstore.api.sync.SyncAPIConnector;
  *
  * @author Filip
  */
-@EnableJms
+
 @Component
 public final class APISyncAdapter  {
     
@@ -74,16 +86,15 @@ public final class APISyncAdapter  {
         return isConnected;
     }
     
-    
-    public APISyncAdapter()
+    @Autowired
+    public APISyncAdapter(Configuration config)
     {
-        
+        init(config.getServerType().name(), config.getUsername(), config.getPassword());
     }
     
     public APISyncAdapter(String serverType)
     {
         init(serverType);
-
     }
     public void init(String serverType, String username, String password)
     {
@@ -103,7 +114,14 @@ public final class APISyncAdapter  {
                 this.isConnected = true;
             }
             this.ServerType = ServerType1;
-        }catch (IOException ex) {
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    keepAlive();
+                }
+            }, 300000, 300000);
+        } catch (IOException exception) {
             this.isConnected = false;
             log.fatal("error");
         }
@@ -118,7 +136,7 @@ public final class APISyncAdapter  {
         }
     }
     
-    public GetCandlesRangeResp getCandlesRange( String symbol, CandlesRange request)
+    public synchronized GetCandlesRangeResp getCandlesRange( String symbol, CandlesRange request)
     {
         GetCandlesRangeResp newResponse = new GetCandlesRangeResp();
         try {
@@ -156,6 +174,7 @@ public final class APISyncAdapter  {
                 CandleDataRecord record = new CandleDataRecord(r.getCtm(), String.valueOf( r.getCtm()), r.getOpen(), r.getHigh(), r.getLow(), r.getClose(), r.getVol(), 0, symbol);
                 newResponse.getRecords().add(record);
             });
+            log.info("Returned "+ newResponse.getRecords().size() + " candle records");
            return newResponse;
         }
         catch ( APICommandConstructionException| APIReplyParseException| APICommunicationException | APIErrorResponse ex) {
@@ -192,7 +211,7 @@ public final class APISyncAdapter  {
             log.fatal("error");
         }
     }
-    public GetAllSymbolsResp GetAllSymbols()
+    public synchronized GetAllSymbolsResp GetAllSymbols()
     {
         try {
             AllSymbolsResponse response =  APICommandFactory.executeAllSymbolsCommand(connector);
@@ -201,23 +220,20 @@ public final class APISyncAdapter  {
                 resp.AddSymbol(rec);
             });
             return resp;
-        } catch (APICommandConstructionException | APIReplyParseException | APICommunicationException ex) {
-            log.fatal("error");
-        } catch (APIErrorResponse ex) {
-            System.out.println(ex.getMessage());
-            log.fatal("error");
+        } catch (APICommandConstructionException | APIReplyParseException | APICommunicationException | APIErrorResponse ex) {
+            log.fatal("error " + ex.getStackTrace());
         }
         return null;                
     }    
-    public void GetCalendar()
+    public synchronized void GetCalendar()
     {
         
     }
-    public void GetCommisionDef()
+    public synchronized void GetCommisionDef()
     {
         
     }
-    public GetUserDataResp GetUserData()
+    public synchronized GetUserDataResp GetUserData()
     {
         try {
             CurrentUserDataResponse response = APICommandFactory.executeCurrentUserDataCommand(connector);
@@ -250,7 +266,7 @@ public final class APISyncAdapter  {
     {
         
     }
-    public GetSymbolResp GetSymbol(GetSymbolReq request)
+    public synchronized GetSymbolResp GetSymbol(GetSymbolReq request)
     {
         try {
             SymbolResponse resp = APICommandFactory.executeSymbolCommand(connector, request.getSymbol());
@@ -261,13 +277,25 @@ public final class APISyncAdapter  {
             
         } catch (APICommandConstructionException | APIReplyParseException | APIErrorResponse | APICommunicationException ex) {
             log.fatal("error");
-            log.fatal(ex);
+            log.fatal(ex.getStackTrace());
             return null;
         }        
     }
-    public void GetTradeRecords()
+    public GetTradesResp GetTradeRecords()
     {
-        
+        try {
+            TradesResponse apiResponse = APICommandFactory.executeTradesCommand(connector, true);
+            TradeRecord s = apiResponse.getTradeRecords().get(0);
+            GetTradesResp response = new GetTradesResp();
+            for(TradeRecord r : apiResponse.getTradeRecords())
+            {
+                response.getRecords().add(new APITradeRecord(r));
+            }
+            return response;
+        } catch (APICommandConstructionException | APIReplyParseException | APICommunicationException | APIErrorResponse ex) {
+            log.fatal("Eroor in comunication on getTrades wtih exception " + ex.getStackTrace());
+            return null;
+        }
     }
     
     public GetTradingHoursResp GetTradingHours(GetTradingHoursReq request)
@@ -317,15 +345,25 @@ public final class APISyncAdapter  {
     {
         
     }
-    //ping
-    public void KeepAlive()
+    
+    public void keepAlive()
     {
-        
+        try {
+            this.connector.safeExecuteCommand(new PingCommand());
+        } catch (APICommunicationException | APICommandConstructionException ex) {
+                log.fatal(ex.getStackTrace());
+        }
     }
     
     public void TradeTransaction()
     {
-        
+        TradeTransInfoRecord command = new TradeTransInfoRecord(TRADE_OPERATION_CODE.BUY, TRADE_TRANSACTION_TYPE.OPEN, Double.NaN, 
+                Double.NaN, Double.NaN, ServerType, Double.NaN, Long.MIN_VALUE, ServerType, Long.MIN_VALUE);
+        try {
+            TradeTransactionResponse resp = APICommandFactory.executeTradeTransactionCommand(connector, command);
+            
+        } catch (APICommandConstructionException | APICommunicationException | APIErrorResponse | APIReplyParseException ex) {
+        }
     }
     public void TradeTransactionStatus()
     {

@@ -5,7 +5,7 @@
         <Property name="log-path">C:/logs/</Property>
     </Properties>
     <Appenders>
-        <RollingFile name="RollingFile" fileName="myexample.log"
+        <RollingFile name="RollingFile" fileName="/var/log/tomcat8/forexmqadapter/myexample.log"
                      filePattern="myexample-%d{yyyy-MM-dd}-%i.log" >
             <PatternLayout>
                 <pattern>%d{dd/MMM/yyyy HH:mm:ss,SSS}- %c{1}: %m%n</pattern>
@@ -36,14 +36,14 @@
         <Logger name="org.hibernate.secure" level="error" />
         <!-- Log everything (a lot of information, but very useful for troubleshooting) -->
         <Logger name="org.hibernate" level="error" />
-        <Logger name = "org.springframework.boot.logging.ClasspathLoggingApplicationListener" level="info" additivity ="false">
-            <appender-ref ref="RollingFile" level="info"/>
+        <Logger name = "org.springframework.boot.logging.ClasspathLoggingApplicationListener" level="debug" additivity ="false">
+            <appender-ref ref="RollingFile" level="debug"/>
         </Logger>
         <logger name="org.hibernate">
             <level value="error" />
         </logger>
         <Logger name="root" level="info" additivity="false">
-            <appender-ref ref="RollingFile" level="error"/>
+            <appender-ref ref="RollingFile" level="debug"/>
         </Logger>
         <Root level="info" additivity="false">
             <AppenderRef ref="RollingFile"/>

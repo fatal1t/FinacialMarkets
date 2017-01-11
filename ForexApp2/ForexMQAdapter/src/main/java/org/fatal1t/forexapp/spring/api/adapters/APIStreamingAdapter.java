@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Future;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.fatal1t.forexapp.spring.api.eventdata.BalanceRecord;
@@ -18,7 +21,6 @@ import org.fatal1t.forexapp.spring.session.SessionLocal;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.NewsRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.annotation.EnableJms;
 import org.springframework.stereotype.Component;
 import pro.xstore.api.message.command.APICommandFactory;
 import pro.xstore.api.message.error.APICommandConstructionException;
@@ -32,7 +34,8 @@ import pro.xstore.api.streaming.StreamingListener;
 import pro.xstore.api.sync.Credentials;
 import pro.xstore.api.sync.SyncAPIConnector;
 import org.fatal1t.forexapp.spring.api.eventdata.TickRecord;
-import org.fatal1t.forexapp.spring.api.eventdata.TradeRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.APITradeRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.StreamingTradeRecord;
 import org.fatal1t.forexapp.spring.resources.db.Symbol;
 import org.fatal1t.forexapp.spring.resources.db.SymbolsRepository;
 import pro.xstore.api.message.records.SBalanceRecord;
@@ -45,7 +48,7 @@ import pro.xstore.api.message.records.STradeRecord;
  * @author Filip
  */
 @Component
-public class APIStreamingAdapter extends Thread {
+public class APIStreamingAdapter {
     @Autowired
     private AsyncConnector connector;
     @Autowired
@@ -55,12 +58,27 @@ public class APIStreamingAdapter extends Thread {
     public boolean isConnected;
     private boolean isLoggedIn;
     private SyncAPIConnector tickConnector;
-
-    @Override
+    private boolean close = false;
+    private Future<Integer> resultCode;
+    
+    @PostConstruct
+    private void init()
+    {
+        //this.start();
+    }
+    @PreDestroy
+    private void destroy() throws APICommunicationException
+    {
+        this.tickConnector.close();
+        resultCode.cancel(true);
+        log.info("Closign streaming adapter");
+    }
+    
     public void start()
     {  
         this.session = AppSession.getSession();
-        initate();
+        this.tickConnector = initConnector();
+                
         try {            
             /// Tick data listenener 
             List<String> testSymbols = new ArrayList<>();
@@ -81,14 +99,14 @@ public class APIStreamingAdapter extends Thread {
                  connector.sendMessage(record);
                 }
                 @Override
-              public void receiveCandleRecord(SCandleRecord candleRecord)
-              {                  
-                  CandleDataRecord record = new CandleDataRecord(candleRecord.getCtm(), candleRecord.getCtmString(), 
-                          candleRecord.getOpen(), candleRecord.getHigh(), candleRecord.getLow(), candleRecord.getClose(), 
-                          candleRecord.getVol(), candleRecord.getQuoteId(), candleRecord.getSymbol());
-                  log.info("Async: prijata Candles zprava: " + record.getSymbol() );
-                  connector.sendMessage(record);
-              }
+                public void receiveCandleRecord(SCandleRecord candleRecord)
+                {            
+                    CandleDataRecord record = new CandleDataRecord(candleRecord.getCtm(), candleRecord.getCtmString(), 
+                            candleRecord.getOpen(), candleRecord.getHigh(), candleRecord.getLow(), candleRecord.getClose(), 
+                            candleRecord.getVol(), candleRecord.getQuoteId(), candleRecord.getSymbol());
+                    log.info("Async: prijata Candles zprava: " + record.getSymbol() );
+                    connector.sendMessage(record);
+                }
               
                 @Override
                 public void receiveBalanceRecord(SBalanceRecord record)
@@ -111,7 +129,7 @@ public class APIStreamingAdapter extends Thread {
                 @Override
                 public void receiveTradeRecord(STradeRecord record)
                 {
-                    TradeRecord newRecord = new TradeRecord(record);
+                    StreamingTradeRecord newRecord = new StreamingTradeRecord(record);
                     connector.sendMessage(newRecord);
                 }                
             };                       
@@ -122,16 +140,21 @@ public class APIStreamingAdapter extends Thread {
             this.tickConnector.subscribeKeepAlive();
             this.tickConnector.subscribeNews();
             this.tickConnector.subscribeTrades();
-            
+
             Timer t = new Timer();
             t.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    if(close)
+                    {
+                        return;
+                    }
                     try {
                         tickConnector.safeExecuteCommand(APICommandFactory.createPingCommand());
                     } catch (APICommandConstructionException | APICommunicationException ex) {
                         try {
-                            log.error("Problem s konektort, restartuju");
+                            log.error("Problem s konektorem, restartuju");
+                            log.info(ex.getMessage());
                             tickConnector.close();                            
                             tickConnector = initConnector();
                             tickConnector.connectStream(tickListener);
@@ -143,22 +166,15 @@ public class APIStreamingAdapter extends Thread {
                             tickConnector.subscribeTrades();
                         } catch (IOException | APICommunicationException ex1) {
                            log.fatal(ex1.getStackTrace());
-                           
                         }
                     }
 
                 }
             }, 300000, 300000);
         } catch (IOException | APICommunicationException ex) {
-            ex.printStackTrace();
+            log.fatal(ex.getStackTrace());
         }        
-    }
-    public void initate()
-    {
-        this.tickConnector = initConnector();
-
-    }
-    
+    }    
     private SyncAPIConnector initConnector()
     {
         try {

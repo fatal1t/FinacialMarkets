@@ -14,7 +14,8 @@ import org.fatal1t.forexapp.spring.api.eventdata.BalanceRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.CandleDataRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.NewsRecord;
 import org.fatal1t.forexapp.spring.api.eventdata.TickRecord;
-import org.fatal1t.forexapp.spring.api.eventdata.TradeRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.APITradeRecord;
+import org.fatal1t.forexapp.spring.api.eventdata.StreamingTradeRecord;
 import org.fatal1t.forexapp.spring.config.QueueConfigInterface;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class AsyncConnector {
         //MessageCreator messageCreator = (javax.jms.Session session1) -> session1.createTextMessage(message);
         log.info("Sending a new message: queue: " + queue + "message:" + message.toString().substring(0, 50));
         //jmsTemplate.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        jmsTemplate.setPubSubDomain(true);
+        //jmsTemplate.setPubSubDomain(true);
         jmsTemplate.setReceiveTimeout(60000);        
         jmsTemplate.convertAndSend(queue, message);      
     }
@@ -60,7 +61,7 @@ public class AsyncConnector {
     
     public void sendMessage(BalanceRecord record)
     {
-        sendMessage(record,  BalanceQueueName);
+        sendMessage(record, BalanceQueueName);
     }
     public void sendMessage(NewsRecord record)
     {
@@ -70,7 +71,7 @@ public class AsyncConnector {
     {
         sendMessage(record,  TickQueueName);
     }
-    public void sendMessage(TradeRecord record)
+    public void sendMessage(StreamingTradeRecord record)
     {
         sendMessage(record, TradeQueueName);
     }

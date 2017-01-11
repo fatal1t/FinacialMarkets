@@ -2,7 +2,7 @@ package pro.xstore.api.message.records;
 
 import org.json.simple.JSONObject;
 
-public class TradeRecord extends WrapperTradeRecord {
+    public class TradeRecord extends WrapperTradeRecord {
 
 	private long timestamp;
 

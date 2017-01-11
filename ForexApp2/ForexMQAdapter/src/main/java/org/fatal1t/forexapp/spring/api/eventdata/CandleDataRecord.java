@@ -10,18 +10,21 @@ package org.fatal1t.forexapp.spring.api.eventdata;
  * @author Filip
  */
 public class CandleDataRecord extends BaseRecord {
-    private final long ctm;
-    private final String ctmString;
-    private final double open;
-    private final double high;
-    private final double low;
-    private final double close;
-    private final double vol;
-    private final int quoteId;
-    private final String symbol;
+    private long ctm;
+    private String ctmString;
+    private double open;
+    private double high;
+    private double low;
+    private double close;
+    private double vol;
+    private int quoteId;
+    private String symbol;
 
     
-    
+    public CandleDataRecord()
+    {
+        
+    }
 
     public CandleDataRecord(long ctm, String ctmString, double open, double high, double low, double close, double vol, int quoteId, String symbol) {
         this.ctm = ctm;
@@ -69,5 +72,47 @@ public class CandleDataRecord extends BaseRecord {
 
     public String getSymbol() {
         return symbol;
+    }
+
+    public void setCtm(long ctm) {
+        this.ctm = ctm;
+    }
+
+    public void setCtmString(String ctmString) {
+        this.ctmString = ctmString;
+    }
+
+    public void setOpen(double open) {
+        this.open = open;
+    }
+
+    public void setHigh(double high) {
+        this.high = high;
+    }
+
+    public void setLow(double low) {
+        this.low = low;
+    }
+
+    public void setClose(double close) {
+        this.close = close;
+    }
+
+    public void setVol(double vol) {
+        this.vol = vol;
+    }
+
+    public void setQuoteId(int quoteId) {
+        this.quoteId = quoteId;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "Candle: timestamp: " + this.ctm;
     }
 }

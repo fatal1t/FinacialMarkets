@@ -16,6 +16,7 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import org.springframework.orm.jpa.vendor.HibernateJpaSessionFactoryBean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  *
@@ -23,6 +24,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaSessionFactoryBean;
  */
 @Configuration
 @EnableJms
+@EnableAsync(proxyTargetClass = true)
 public class AppConfig   {
         @Bean
     public HibernateJpaSessionFactoryBean sessionFactory(EntityManagerFactory emf) {
@@ -43,5 +45,4 @@ public class AppConfig   {
         factory.setConnectionFactory(connectionFactory);
         return factory;
         };
-    
 }

@@ -11,28 +11,30 @@ package org.fatal1t.forexapp.spring.api.adapters.requests;
  */
 public class CandlesRange {
 
-    private int id;
+    /**
+     * 
+     */
     private int period;
+    /**
+     * 
+     */
     private long start;
     private long end;
     private long ticks;
-
-    public CandlesRange(int i, int period, long start, long end, long ticks) {
-        this.id = i;
+    /**
+     * 
+     * @param period - delka candle
+     * @param start - pocatecni cas pro nacteni 
+     * @param end - konecny cas pro nacteni 
+     * @param ticks 
+     */
+    public CandlesRange(int period, long start, long end, long ticks) {
+        
         this.period = period;
         this.start = start;
         this.end = end;
         this.ticks = ticks;
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int i) {
-        this.id = i;
-    }
-
     public int getPeriod() {
         return period;
     }
